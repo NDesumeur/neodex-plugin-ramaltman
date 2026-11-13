@@ -23,7 +23,14 @@ The game itself is in French.
 - **The Scalper** sleeps at the loading dock (camera 5). He doesn't move while you watch him. Forget him and he runs down the east hall: right door open, he steals 16 GB; door closed, he bangs on it and it costs power.
 - **The Chips** scratch inside the vent (camera 7). When they reach the hatch above you, close it, or they eat 8 GB.
 
+- **The audio lure** (key **L**, or the button above the map) plays a chime in the room you are watching. If Ram is in a neighboring room, he comes to look: that's how you pull him away from a door. On camera 7, it drives the Chips back. It costs a little power and has to recharge.
+- **From night 2**, Ram sometimes hacks the cameras: "access denied". Reboot them from the office monitor (key **R**, or click the screen): 4 seconds, and it uses power.
+
 Everything uses power: doors, lights, hatch, cameras. At 0%, everything goes dark… and Ram comes humming.
+
+## The story
+
+Why is the camera clock stuck on November 13, 1987? Who was Léo Octet? Papers sometimes lie on the cameras for a few seconds: click them to pick them up. Every night you win also adds a newspaper clipping. Everything can be reread in the **Archives** from the menu, and whoever finds all 8 fragments and survives night 6 gets the true ending.
 
 ## Nights
 
@@ -33,7 +40,7 @@ Everything uses power: doors, lights, hatch, cameras. At 0%, everything goes dar
 
 ## Data and sync
 
-The night reached, the stars and the custom night settings are saved by NeoDex, backed up and synced between your PCs if sync is on.
+The night reached, the stars, the documents found and the custom night settings are saved by NeoDex, backed up and synced between your PCs if sync is on.
 
 ## Good to know
 

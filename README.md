@@ -21,7 +21,14 @@ Le problème, c'est **Ram Altman**. L'ancien patron de ClosedRAM s'est fait remp
 - **Le Revendeur** dort au quai de livraison (caméra 5). Tant que tu le regardes, il ne bouge pas. Si tu l'oublies, il court par le couloir est : porte droite ouverte, il te vole 16 Go ; porte fermée, il tape dedans et ça coûte du courant.
 - **Les Puces** grattent dans la gaine de ventilation (caméra 7). Quand elles arrivent au-dessus de toi, ferme la trappe, sinon elles mangent 8 Go.
 
+- **Le leurre audio** (touche **L**, ou le bouton au-dessus de la carte) joue un carillon dans la pièce que tu regardes. Si Ram est dans une pièce voisine, il vient voir : c'est le moyen de l'éloigner d'une porte. Sur la caméra 7, il fait reculer les Puces. Il coûte un peu de courant et doit recharger.
+- **À partir de la nuit 2**, Ram pirate parfois les caméras : « accès refusé ». Redémarre-les depuis le moniteur du bureau (touche **R**, ou clic sur l'écran) : 4 secondes, et ça consomme.
+
 Tout consomme du courant : portes, lumières, trappe, caméras. À 0 %, tout s'éteint… et Ram arrive en fredonnant.
+
+## L'histoire
+
+Pourquoi l'horloge des caméras est-elle bloquée au 13 novembre 1987 ? Qui était Léo Octet ? Des papiers traînent parfois quelques secondes sur les caméras : clique dessus pour les ramasser. Chaque nuit gagnée ajoute aussi un article de journal. Tout se relit dans les **Archives** du menu, et qui trouve les 8 fragments puis tient la nuit 6 découvre la vraie fin.
 
 ## Nuits
 
@@ -31,7 +38,7 @@ Tout consomme du courant : portes, lumières, trappe, caméras. À 0 %, tout s'�
 
 ## Données et synchronisation
 
-La nuit atteinte, les étoiles et les réglages de la nuit perso sont enregistrés par NeoDex, sauvegardés et synchronisés entre tes PC si la synchro est activée.
+La nuit atteinte, les étoiles, les documents trouvés et les réglages de la nuit perso sont enregistrés par NeoDex, sauvegardés et synchronisés entre tes PC si la synchro est activée.
 
 ## À savoir
 
