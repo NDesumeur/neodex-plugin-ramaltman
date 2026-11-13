@@ -6,7 +6,7 @@ The problem is **Ram Altman**, the head of ClosedRAM. That's the name he goes by
 
 *Version française : [README.md](README.md)*
 
-The game itself is in French.
+The game is in English and French: it follows the NeoDex language, or pick one in Settings.
 
 ## Controls
 
@@ -40,7 +40,7 @@ Why is the camera clock stuck on November 13, 1987? Who was Léo Octet? Papers s
 - Night 1 starts with a short tutorial with arrows (replay it from Settings).
 
 - After each night, a report: power left, sticks lost, repairs, and your power record.
-- 6 nights, each harder, each with its phone message (subtitled, and read aloud if your system has a French voice).
+- 6 nights, each harder, each with its phone message (subtitled, with the game's own murmured voices).
 - **Custom night**: set each threat from 0 to 20, and add challenges (no lure, 50% power, slow tablet). A challenge won with every threat at 10 or more earns a medal.
 - **Night 7**: hidden, it unlocks after the true ending. This time you are Léo, and the guard is looking for you on the cameras.
 - **Three stars**: beat night 5, night 6, then the custom night at 20 / 20 / 20.
@@ -51,7 +51,7 @@ The night reached, the stars, the documents found and the custom night settings 
 
 ## Good to know
 
-Jumpscares, screams and sudden noises. In **Settings**: sound and voice volume, mute, look speed, and softened jumpscares (no scream, no hallucinations).
+Jumpscares, screams and sudden noises. In **Settings**: sound and voice volume, mute, language (French or English, NeoDex's by default), look speed, and softened jumpscares (no scream, no hallucinations).
 
 Ram Altman is a made-up character: the name is a joke, the story is not. Everything is painted with the canvas brush (no images) and every sound is made live.
 

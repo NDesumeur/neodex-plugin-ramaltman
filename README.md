@@ -38,7 +38,7 @@ Pourquoi l'horloge des caméras est-elle bloquée au 13 novembre 1987 ? Qui éta
 - La nuit 1 commence par un petit tutoriel, avec des flèches (il se rejoue depuis les Réglages).
 
 - À la fin de chaque nuit, un compte rendu : courant restant, barrettes perdues, réparations, et ton record de courant.
-- 6 nuits, de plus en plus dures, chacune avec son message au téléphone (sous-titré, et lu à voix haute si ton système a une voix française).
+- 6 nuits, de plus en plus dures, chacune avec son message au téléphone (sous-titré, avec des voix murmurées propres au jeu).
 - **Nuit perso** : règle chaque menace de 0 à 20, et ajoute des défis (sans leurre, courant à 50 %, tablette lente). Un défi gagné avec chaque menace à 10 ou plus donne une médaille.
 - **Nuit 7** : cachée, elle s'ouvre après la vraie fin. Cette fois, tu es Léo, et c'est le veilleur qui te cherche aux caméras.
 - **Trois étoiles** : finir la nuit 5, la nuit 6, puis la nuit perso en 20 / 20 / 20.
@@ -49,7 +49,7 @@ La nuit atteinte, les étoiles, les documents trouvés et les réglages de la nu
 
 ## À savoir
 
-Des sauts au visage, des cris et des bruits soudains. Dans les **Réglages** : volume des bruits et des voix, son coupé, vitesse du regard, et sauts au visage atténués (pas de cri ni d'hallucinations).
+Des sauts au visage, des cris et des bruits soudains. Dans les **Réglages** : volume des bruits et des voix, son coupé, langue (français ou anglais, par défaut celle de NeoDex), vitesse du regard, et sauts au visage atténués (pas de cri ni d'hallucinations).
 
 Ram Altman est un personnage inventé : le nom fait sourire, l'histoire beaucoup moins. Tout est dessiné au pinceau du canvas (aucune image) et tous les sons sont fabriqués en direct.
 
