@@ -57,7 +57,7 @@ Jumpscares, screams and sudden noises. In **Settings**: sound and voice volume, 
 
 All characters are made up: the names are a joke, the story is not. Everything is painted with the canvas brush (no images) and the sounds are made live.
 
-The voices are made with [Piper](https://github.com/rhasspy/piper) and these free voices: *fr_FR-upmc-medium* ([UPMC Pierre and Jessica](https://github.com/marytts/upmc-pierre-data) data, CC BY-SA 4.0), *en_US-libritts_r-medium* ([LibriTTS-R](http://www.openslr.org/141/) data, CC BY 4.0) and *en_US-joe-medium* (CC0).
+The voices are made with [XTTS v2](https://huggingface.co/coqui/XTTS-v2) (Coqui), with its made-up studio voices, under the [Coqui Public Model License](https://coqui.ai/cpml): non-commercial use, the game is free.
 
 ## Install
 

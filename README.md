@@ -55,7 +55,7 @@ Des sauts au visage, des cris et des bruits soudains. Dans les **Réglages** : v
 
 Tous les personnages sont inventés : les noms font sourire, l'histoire beaucoup moins. Tout est dessiné au pinceau du canvas (aucune image) et les bruits sont fabriqués en direct.
 
-Les voix sont faites avec [Piper](https://github.com/rhasspy/piper) et ces voix libres : *fr_FR-upmc-medium* (données [UPMC Pierre et Jessica](https://github.com/marytts/upmc-pierre-data), CC BY-SA 4.0), *en_US-libritts_r-medium* (données [LibriTTS-R](http://www.openslr.org/141/), CC BY 4.0) et *en_US-joe-medium* (CC0).
+Les voix sont faites avec [XTTS v2](https://huggingface.co/coqui/XTTS-v2) (Coqui), avec ses voix de studio inventées, sous la [Coqui Public Model License](https://coqui.ai/cpml) : usage non commercial, le jeu est gratuit.
 
 ## Installer
 
