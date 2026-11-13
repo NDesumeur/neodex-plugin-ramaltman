@@ -1,0 +1,23 @@
+{
+  "id": "neodex.ramaltman",
+  "name": "Ram Altman",
+  "version": "1.0.0",
+  "author": "NDesumeur",
+  "description": "Ram Altman, un jeu d'horreur et de survie (une parodie) : veilleur de nuit chez Octet & Fils, tu gardes la Pile, les 64 derniers Go de RAM, de minuit à 6 h. Ram Altman, patron robotisé de ClosedRAM, veut toute la RAM du monde. Caméras, portes, lumières, trappe d'aération et un courant qui s'épuise, contre lui, le Revendeur et les Puces. 6 nuits, une nuit perso, trois étoiles. Dessiné au pinceau, pas en pixels.",
+  "icon": "icon.png",
+  "entry": "index.js",
+  "view": "ramaltman",
+  "type": "app",
+  "category": "Jeux",
+  "compatibility": ["windows", "linux"],
+  "syncMode": "progression",
+  "syncInfo": "Nuit atteinte, étoiles et réglages de la nuit perso.",
+  "gamepad": false,
+  "mobile": false,
+  "system": false,
+  "dependencies": {},
+  "sdk": "2.1.0",
+  "permissions": [
+    "storage"
+  ]
+}
