@@ -163,7 +163,7 @@ function tearPath(g, side) {  // side 1 : le côté peau (gauche de l'image), -1
 }
 function head(g, x, y, s, lit, t, big) {
   g.save(); g.translate(x, y); g.scale(s, s);
-  const dim = c => shade(c, lit), open = big ? 1 : 0, r = rng(7), sh = (px, fn, c, lw) => soft(g, px, fn, c, lw);
+  const dim = c => shade(c, lit), open = big === true ? 1 : +big || 0, r = rng(7), sh = (px, fn, c, lw) => soft(g, px, fn, c, lw);
   const E = (cx, cy, rx, ry, a = 0) => () => { g.beginPath(); g.ellipse(cx, cy, rx, ry, a, 0, Math.PI * 2); };
   // oreilles : la gauche en peau, décollée ; la droite en métal, avec une prise
   form(g, [-62, -26, -80, -34, -88, -8, -82, 20, -64, 14], dim('#b08670'), { aw: 8, ao: .55 });
@@ -631,6 +631,10 @@ function makeAudio() {
       let tt = at; for (const [n, d] of M) { if (n) { const f = 440 * Math.pow(2, (n - 69) / 12); tone({ f, dur: d * .5 + .6, vol: .1, at: tt }); tone({ f: f * 4, dur: .25, vol: .02, at: tt }); } tt += d * .34; }
       return tt;
     },
+    // sa respiration : un souffle lent, filtré, à gauche ou à droite
+    breath(pan = 0, near = .5) { noise({ f: 420, q: .7, dur: 1.3, vol: .05 + near * .14, attack: .55, pan }); noise({ f: 300, q: .7, dur: 1.1, vol: .04 + near * .12, attack: .45, pan, at: 1.45 }); },
+    // une image qui n'aurait pas dû être là
+    glitch() { noise({ f: 3000, q: .3, dur: .28, vol: .5, type: 'highpass' }); tone({ f: 90, type: 'sawtooth', dur: .25, vol: .35, slide: 3 }); tone({ f: 1200, type: 'square', dur: .2, vol: .08, slide: .3 }); },
     tick() { tone({ f: 2000, type: 'square', dur: .015, vol: .02 }); },
     click() { tone({ f: 700, type: 'square', dur: .03, vol: .05 }); noise({ f: 3000, q: 4, dur: .03, vol: .05 }); },
     deny() { tone({ f: 160, type: 'square', dur: .2, vol: .08 }); },
@@ -704,9 +708,15 @@ export default async function (ctx) {
     const [ra, sc, ch] = ai || NIGHTS[Math.min(n, 6)];
     S = { n, time: 0, hourLen: 60, power: 100, ram: 64, pan: 320, doorL: false, doorR: false, dl: 0, dr: 0, lightL: false, lightR: false, vent: false, va: 0,
       cam: false, ca: 0, sel: 1, ai: { ram: ra, sc, ch }, ramPos: '1', ramT: 0, doorWait: 0, scStage: 0, scRun: 0, scT: 0, scLock: 0, chPos: 0, chT: 0, chWait: 0,
-      disrupt: 0, flick: 0, out: 0, outPhase: 0, call: CALLS[Math.min(n, 6)] && !ai ? { lines: CALLS[Math.min(n, 6)], i: 0, t: 0 } : null, steal: null, said: 0, events: [], usage: 1, hourBumps: 0 };
-    scene = 'card'; sceneT = 0;
+      disrupt: 0, flick: 0, out: 0, outPhase: 0, inside: 0, ramVar: 0, breathT: 0, hallT: 40 + Math.random() * 50, hall: 0, switchT: 0, call: CALLS[Math.min(n, 6)] && !ai ? { lines: CALLS[Math.min(n, 6)], i: 0, t: 0 } : null, steal: null, said: 0, events: [], usage: 1, hourBumps: 0 };
+    scene = 'card'; sceneT = 0; setTimeout(prepJaws, 50);  // l'écran de la nuit laisse le temps de préparer le saut au visage
   }
+  // les images du saut au visage, bouche de plus en plus ouverte, dessinées une seule fois
+  let JAWS = null;
+  function prepJaws() { if (JAWS) return; JAWS = [.1, .4, .7, 1].map(o => { const c = mkCanvas(900, 1100); head(c.getContext('2d'), 450, 500, 3.4, 1, 0, o); return c; }); }
+  // sa tête en gros plan, pour les caméras où il fixe l'objectif
+  let HEADC = null;
+  const headClose = () => HEADC || (HEADC = (() => { const c = mkCanvas(560, 640); head(c.getContext('2d'), 280, 300, 2.2, .7, 0, false); return c; })());
   const ramAt = id => S.ramPos === id;
   const flash = (text, col = '#ff5a4a') => { msg = { text, col, t: 2.4 }; };
 
@@ -737,9 +747,9 @@ export default async function (ctx) {
     S.ramT += dt;
     if (S.ramT >= 4.97) {
       S.ramT -= 4.97;
-      if (!/[LR]/.test(S.ramPos) && R(20) < S.ai.ram) {
+      if (!/[LR]|in/.test(S.ramPos) && R(20) < S.ai.ram) {
         const opts = RAM_NEXT[S.ramPos].filter(id => S.n >= 3 || id !== '6'), to = opts[R(opts.length)], from = S.ramPos;
-        S.ramPos = to; if (S.cam && (S.sel == from || S.sel == to)) S.disrupt = 1.6;  // la caméra qu'on regarde décroche quand il passe
+        S.ramPos = to; S.ramVar = /[368]/.test(to) && R(3) === 0 ? 1 : 0; if (S.cam && (S.sel == from || S.sel == to)) S.disrupt = 1.6;  // la caméra qu'on regarde décroche quand il passe
         if (/[346LR]/.test(to)) A.step(/[34L]/.test(to) ? -.8 : .8, /[LR]/.test(to) ? 1 : .5);
         if (/[LR]/.test(to)) { S.doorWait = Math.max(2.6, 7.5 - S.ai.ram * .22); if (R(3) === 0) ramLine(); }
       }
@@ -749,9 +759,15 @@ export default async function (ctx) {
       S.doorWait -= dt;
       if (S.doorWait <= 0) {
         const closed = S.ramPos === 'L' ? S.doorL : S.doorR;
-        if (closed) { A.bang(S.ramPos === 'L' ? -.8 : .8); S.ramPos = R(2) ? '2' : '1'; } else return die('ram');
+        if (closed) { A.bang(S.ramPos === 'L' ? -.8 : .8); S.ramPos = R(2) ? '2' : '1'; }
+        else { S.ramPos = 'in'; S.inside = 2.5 + Math.random() * 3; S.lightL = S.lightR = false; A.breath(0, 1); if (!S.cam) return die('ram'); }
       }
+      S.breathT -= dt; if (/[LR]/.test(S.ramPos) && S.breathT <= 0) { S.breathT = 2.6 + Math.random() * 2; A.breath(S.ramPos === 'L' ? -.8 : .8, .5); }
     }
+    if (S.ramPos === 'in') { S.inside -= dt; S.flick = .2; if (R(40) === 0) A.breath(0, 1); if (S.inside <= 0) return die('ram'); }
+    // les hallucinations : à partir de la nuit 3, son visage passe parfois devant tes yeux
+    if (S.n >= 3 || S.ai.ram >= 10) { S.hallT -= dt; if (S.hallT <= 0) { S.hallT = 35 + Math.random() * 60; S.hall = .2; A.glitch(); } }
+    if (S.hall > 0) S.hall -= dt; if (S.switchT > 0) S.switchT -= dt;
     // ---- le Revendeur : il prépare son coup quand on ne le regarde pas
     S.scT += dt; if (S.scLock > 0) S.scLock -= dt;
     const watching = S.cam && S.sel == 5;
@@ -807,7 +823,7 @@ export default async function (ctx) {
   }
   function die(why) {
     if (scene !== 'play') return;
-    A.hush(); A.ambience(false); scene = 'jump'; sceneT = 0; S.why = why; A.scream();
+    A.hush(); A.ambience(false); scene = 'jump'; sceneT = 0; S.why = why; S.side = S.ramPos === 'R' ? 'R' : 'L'; A.scream();
     setTimeout(() => A.say(why === 'empty' ? 'Merci pour toute ta RAM.' : 'Ta RAM. Enfin.', { rate: .8, pitch: .4, alt: true }), 1700);
   }
 
@@ -822,7 +838,7 @@ export default async function (ctx) {
   }
   // l'encadrement éclairé : le couloir au-delà, et ce qui s'y tient
   function drawDoorway(side) {
-    const d = side === 'L' ? DOOR_L : DOOR_R, x = d.x - S.pan, y = DOOR_Y, on = side === 'L' ? S.lightL : S.lightR, here = ramAt(side), closed = side === 'L' ? S.dl : S.dr;
+    const d = side === 'L' ? DOOR_L : DOOR_R, x = d.x - S.pan, y = DOOR_Y, here = ramAt(side), on = (side === 'L' ? S.lightL : S.lightR) && !(here && R(6) === 0), closed = side === 'L' ? S.dl : S.dr;
     if (closed > .97) return;
     g.save(); g.beginPath(); g.rect(x, y, d.w, DOOR_H); g.clip();
     if (on) {
@@ -831,12 +847,13 @@ export default async function (ctx) {
       poly(g, [x, y, x + d.w * .3, y + DOOR_H * .3, x + d.w * .3, y + DOOR_H * .55, x, y + DOOR_H], '#2e2a20');
       poly(g, [x + d.w, y, x + d.w * .7, y + DOOR_H * .3, x + d.w * .7, y + DOOR_H * .55, x + d.w, y + DOOR_H], '#2a261c');
       g.fillStyle = '#0c0a08'; g.fillRect(x + d.w * .3, y + DOOR_H * .3, d.w * .4, DOOR_H * .25);
-      if (here) litChar(g, (cg, a, b, s) => drawRam(cg, a, b, s, 'lean', .9, T), x + d.w / 2 + (side === 'L' ? 10 : -10), y + DOOR_H + 30, .68, side === 'L' ? 1 : -1, .35, 'ramlean');
+      if (here) { const fx = x + d.w / 2 + (side === 'L' ? 10 : -10), fy = y + DOOR_H + 30; g.save(); g.translate(fx, fy); g.rotate(Math.sin(T * .9) * .012 + (T % 3.7 < .07 ? .035 : 0)); g.scale(1, 1 + Math.sin(T * 1.6) * .006); g.translate(-fx, -fy);
+        litChar(g, (cg, a, b, s) => drawRam(cg, a, b, s, 'lean', .9, T), fx, fy, .68, side === 'L' ? 1 : -1, .35, 'ramlean'); g.restore(); }
       g.fillStyle = rad(g, x + d.w / 2, y + 40, 10, DOOR_H, [[0, 'rgba(255,230,170,.18)'], [1, 'rgba(0,0,0,.55)']]); g.fillRect(x, y, d.w, DOOR_H);
     } else { g.fillStyle = '#030304'; g.fillRect(x, y, d.w, DOOR_H); }
     g.restore();
     // dans le noir, ses yeux seuls trahissent qu'il est là
-    if (here) { const s = .68; ramGlow(g, x + d.w / 2 + (side === 'L' ? 10 : -10), y + DOOR_H + 30, s, 'lean', on ? 1 : .6); }
+    if (here && (on || Math.sin(T * 1.7 + (side === 'L' ? 0 : 2)) > .992)) ramGlow(g, x + d.w / 2 + (side === 'L' ? 10 : -10), y + DOOR_H + 30, .68, 'lean', on ? 1 : .45);
   }
   // un bouton de panneau (porte en rouge, lumière en blanc), allumé ou non
   function panelButton(x, y, color, on, label) {
@@ -851,6 +868,8 @@ export default async function (ctx) {
     g.drawImage(office.c, p, 0, W, H, 0, 0, W, H);
     // les LED des serveurs derrière la vitre
     for (const [lx, ly, c, ph] of office.leds) { const x = lx - p; if (x < -10 || x > W + 10 || dark) continue; const on = Math.sin(T * (2 + ph * 6) + ph * 9) > -.2; if (!on) continue; g.fillStyle = c === 'g' ? '#3cff8a' : c === 'a' ? '#ffb43a' : '#ff4a3a'; g.fillRect(x - 2, ly - 2, 4, 4); }
+    if (S.ramPos === '2' && !dark) { const wx = 960 - p + Math.sin(T * .23) * 150; g.save(); g.beginPath(); g.rect(706 - p, 156, 508, 208); g.clip();
+      litChar(g, (cg, a, b, s) => drawRam(cg, a, b, s, 'stand', .5, T), wx, 420, .34, -1, .15, 'ramwin'); g.fillStyle = 'rgba(2,4,8,.62)'; g.fillRect(706 - p, 156, 508, 208); ramGlow(g, wx, 420, .34, 'stand', .5); g.restore(); }
     drawDoorway('L'); drawDoorway('R');
     drawShutter(DOOR_L, S.dl); drawShutter(DOOR_R, S.dr);
     // la trappe d'aération au plafond, et ce qui y gratte
@@ -873,8 +892,10 @@ export default async function (ctx) {
     const mx = 560 - p; g.fillStyle = dark ? '#000' : 'rgba(40,120,90,.25)'; g.fillRect(mx + 10, 420, 220, 140);
     if (!dark) { g.fillStyle = '#7ef0b4'; g.font = '14px Consolas, monospace'; ['OCTET & FILS', 'NUIT ' + S.n, 'PILE : ' + S.ram + ' Go', 'COURANT : ' + Math.max(0, S.power | 0) + ' %', T % 1 < .5 ? '> _' : '>'].forEach((l, i) => g.fillText(l, mx + 22, 446 + i * 22)); }
     // la lumière de la pièce : la lampe du bureau, qui vacille ; noir presque total sans courant
-    const lamp = S.out ? 0 : S.flick > 0 ? .35 + Math.random() * .3 : 1;
+    const lamp = S.out ? 0 : S.flick > 0 ? (S.ramPos === 'in' ? Math.random() * .5 : .35 + Math.random() * .3) : 1;
     g.fillStyle = rad(g, 960 - p, 520, 40, 1050, [[0, `rgba(0,0,0,${.15 + (1 - lamp) * .6})`], [.5, `rgba(0,0,0,${.5 + (1 - lamp) * .4})`], [1, `rgba(0,0,0,${.88 + (1 - lamp) * .1})`]]); g.fillRect(0, 0, W, H);
+    if (S.ramPos === 'in') { const sx = 960 - p + Math.sin(T * 1.3) * 40; soft(g, 18, () => blobPath(g, [sx - 300, 600, sx - 230, 340, sx - 100, 270, sx - 80, 140, sx, 80, sx + 80, 140, sx + 100, 270, sx + 230, 340, sx + 300, 600]), 'rgba(0,0,0,.88)');
+      if (R(3)) for (const ex of [-26, 24]) glow(g, sx + ex, 150, 16, '110,240,255', .8); }
     if (S.out) { g.fillStyle = 'rgba(0,0,0,.9)'; g.fillRect(0, 0, W, H); if (S.outPhase === 1) { const x = DOOR_L.x - p + DOOR_L.w / 2; ramGlow(g, x, DOOR_Y + DOOR_H + 30, .68, 'lean', .8 + .4 * Math.sin(T * 9)); } }
     // une Puce ou le Revendeur qui vient de voler
     if (S.steal) {
@@ -886,11 +907,12 @@ export default async function (ctx) {
 
   // ---------- dessin des caméras ----------
   function drawCam() {
-    const id = S.sel, room = rooms[id];
+    const id = S.sel, room = rooms[id], here = S.ramPos == id, close = here && S.ramVar && /[368]/.test(id), ox = Math.sin(T * .22 + +id) * 46;
+    g.save(); g.translate(W / 2, H / 2); g.scale(1.08, 1.08); g.translate(-W / 2 - ox, -H / 2);
     g.drawImage(room.base, 0, 0);
     const lit = .75, ch = (draw, x, y, s, side = -1, key) => litChar(g, draw, x, y, s, side, .4, key);
     const ram = pose => (cg, a, b, s) => drawRam(cg, a, b, s, pose, lit, T), sc = pose => (cg, a, b, s) => drawScalper(cg, a, b, s, pose, lit, T);
-    if (S.ramPos == id && room.spots.ram) ch(ram(id === '4' ? 'lean' : 'stand'), ...room.spots.ram, -1, id === '4' ? 'ramlean' : 'ramstand');
+    if (here && room.spots.ram && !close) { const [fx, fy] = room.spots.ram; g.save(); g.translate(fx, fy); g.rotate(Math.sin(T * .7) * .01 + (T % 4.3 < .06 ? .03 : 0)); g.translate(-fx, -fy); ch(ram(id === '4' ? 'lean' : 'stand'), ...room.spots.ram, -1, id === '4' ? 'ramlean' : 'ramstand'); g.restore(); }
     if (id === '5') { const [x, y, s] = room.spots.scalper; drawCart(g, ...room.spots.cart, lit);
       if (S.scStage === 0) { ell(g, 1040, 470, 10, 10, '#000'); }
       else if (S.scStage === 1) ch(sc('stand'), x + 260, y, s * .9, 1, 'sc');
@@ -898,13 +920,19 @@ export default async function (ctx) {
     if (id === '6' && S.scRun) ch(sc('run'), 640 + (4.2 - S.scRun) * 60, 600 + (4.2 - S.scRun) * 40, +(.55 + (4.2 - S.scRun) * .2).toFixed(1), 1, 'scrun' + (T * 12 | 0) % 6);
     if (id === '7') for (let i = 0; i < (S.chPos ? 1 + Math.min(3, S.chPos) : 0); i++) { const k = S.chPos / 4, s = .35 + k * 1.4; drawChip(g, 640 + (i - 1) * 90 * s, 345 + k * 200 + (i % 2) * 20 * s, s, .8, T, i); }
     g.drawImage(room.shade, 0, 0);
+    if (here && R(5) === 0) { g.fillStyle = 'rgba(0,0,0,.55)'; g.fillRect(-60, 0, W + 120, H); }  // la lampe de la pièce saute
     // les yeux et les LED percent l'ombre
-    if (S.ramPos == id && room.spots.ram) ramGlow(g, ...room.spots.ram, id === '4' ? 'lean' : 'stand', .8);
+    if (here && room.spots.ram && !close) ramGlow(g, ...room.spots.ram, id === '4' ? 'lean' : 'stand', .8);
+    if (close) { const hx = 520, hy = 480; soft(g, 6, () => blobPath(g, [hx - 330, H + 40, hx - 300, hy + 230, hx - 150, hy + 170, hx, hy + 190, hx + 150, hy + 170, hx + 300, hy + 230, hx + 330, H + 40]), '#09090b');
+      g.save(); g.translate(hx, hy); g.rotate(.2 + Math.sin(T * .5) * .03 + (T % 3.1 < .06 ? .08 : 0)); g.drawImage(headClose(), -280, -300); g.fillStyle = 'rgba(0,0,6,.35)'; g.fillRect(-280, -300, 560, 640);
+      for (const ex of [-30, 28]) { glow(g, ex * 2.2, -22 * 2.2, 46, '110,240,255', .9); glow(g, ex * 2.2, -22 * 2.2, 8, '230,255,255', 1); } g.restore(); }
     if (id === '5' && S.scStage === 0) glow(g, 1040, 470, 24, '255,50,40', .9);
     if (id === '7') for (let i = 0; i < (S.chPos ? 1 + Math.min(3, S.chPos) : 0); i++) { const k = S.chPos / 4, s = .35 + k * 1.4; glow(g, 640 + (i - 1) * 90 * s, 345 + k * 200 + (i % 2) * 20 * s - 24 * s, 30 * s, '120,255,120', .8); }
     for (const [lx, ly, c, ph] of room.leds) if (Math.sin(T * (2 + ph * 6) + ph * 9) > -.2) { g.fillStyle = c === 'g' ? '#3cff8a' : c === 'a' ? '#ffb43a' : '#ff4a3a'; g.fillRect(lx - 2, ly - 2, 4, 4); }
-    // l'image de caméra : grain fort, lignes, déchirures, et le signal perdu quand quelqu'un passe
-    g.save(); g.globalAlpha = .1 + (S.disrupt > 0 ? .6 : 0); g.globalCompositeOperation = 'screen'; g.imageSmoothingEnabled = false; g.drawImage(NOISE[(T * 30 | 0) % 4], 0, 0, W, H); g.restore();
+    g.restore();
+    // l'image de caméra : grain, lignes, rayures, déchirures, et la neige quand on change de caméra ou quand quelqu'un passe
+    if (R(3) === 0) { g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(R(W), 0, 1 + R(2), H); }
+    g.save(); g.globalAlpha = .1 + (S.disrupt > 0 ? .6 : 0) + (S.switchT > 0 ? .8 : 0); g.globalCompositeOperation = 'screen'; g.imageSmoothingEnabled = false; g.drawImage(NOISE[(T * 30 | 0) % 4], 0, 0, W, H); g.restore();
     g.drawImage(SCAN, 0, 0);
     if (R(6) === 0) { const y = R(H); g.drawImage(cv, 0, y, W, 8, R(20) - 10, y, W, 8); }
     if (S.disrupt > 0) { g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(0, 0, W, H); g.fillStyle = '#e8e8e8'; g.font = 'bold 36px Consolas, monospace'; g.textAlign = 'center'; g.fillText('SIGNAL PERDU', W / 2, H / 2); g.textAlign = 'left'; }
@@ -912,6 +940,7 @@ export default async function (ctx) {
     // REC, nom de la caméra, carte
     if (T % 1.2 < .7) ell(g, 42, 92, 9, 9, '#ff2a2a'); g.fillStyle = '#eee'; g.font = 'bold 20px Consolas, monospace'; g.fillText('REC', 58, 99);
     g.font = 'bold 24px Consolas, monospace'; g.fillText('CAM ' + id + ' · ' + room.name, 30, 136);
+    const sec = S.time / S.hourLen * 3600 | 0; g.font = '16px Consolas, monospace'; g.fillStyle = 'rgba(230,230,230,.75)'; g.fillText(`${String(sec / 3600 | 0).padStart(2, '0')}:${String(sec / 60 % 60 | 0).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}  1987-11-13`, 30, 162);
     drawMap();
   }
   function drawMap() {
@@ -977,7 +1006,7 @@ export default async function (ctx) {
     g.fillStyle = '#05080a'; g.fillRect(0, 0, W, H); g.fillStyle = '#ececec'; g.font = '48px Impact, "Arial Black", sans-serif'; g.fillText('COMMENT JOUER', 80, 100);
     g.font = '20px Georgia'; g.fillStyle = '#ccc';
     ['Tiens de 00 h à 06 h sans perdre la Pile (64 Go de RAM).', '', 'Souris aux bords de l\'écran (ou ← →) : regarder à gauche et à droite.', 'Q / D : porte gauche / droite.   A / E : lumière gauche / droite.', 'V : trappe d\'aération.   ESPACE : les caméras (1 à 8 pour en choisir une).   C : couper le message.', '',
-      'RAM ALTMAN : il marche vers tes portes. S\'il entre, c\'est fini. Éclaire, et ferme à temps.', 'LE REVENDEUR : regarde-le à la caméra 5, sinon il court par le couloir est (−16 Go si la porte droite est ouverte).', 'LES PUCES : elles grattent dans la gaine (caméra 7). Ferme la trappe quand elles arrivent (−8 Go sinon).', '',
+      'RAM ALTMAN : il marche vers tes portes. Dans le noir on ne le voit pas : éclaire. S\'il entre, plus rien ne marche… ne baisse pas la tablette.', 'LE REVENDEUR : regarde-le à la caméra 5, sinon il court par le couloir est (−16 Go si la porte droite est ouverte).', 'LES PUCES : elles grattent dans la gaine (caméra 7). Ferme la trappe quand elles arrivent (−8 Go sinon).', '',
       'Tout consomme du courant. À 0 %, tout s\'éteint… et il fredonne.', '', '[ cliquer pour revenir ]'].forEach((l, i) => g.fillText(l, 80, 170 + i * 34));
   }
   function drawCustom() {
@@ -1008,14 +1037,14 @@ export default async function (ctx) {
     if (sceneT > 3) { g.font = '20px Georgia'; g.fillStyle = '#aaa'; g.fillText(S.n === 5 ? 'Fin de semaine. Ta paie : 120 € et une barrette de 4 Go. Nuit 6 débloquée.' : S.n === 6 ? 'Il n\'a rien eu. Il sourit quand même. Nuit perso débloquée.' : '[ cliquer pour continuer ]', W / 2, H / 2 + 120); }
     g.textAlign = 'left'; post(g, T, .1, .6);
   }
-  let BIG = null;
   function drawJump() {
     const t = sceneT;
     if (t < 1.4) {
       // le saut au visage : il fonce sur toi, l'image tremble, rougit, se déchire
       g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
       const s = 2.2 + t * 1.6 + Math.sin(t * 50) * .05, sx = Math.sin(t * 70) * 18, sy = Math.cos(t * 55) * 14;
-      if (S.why === 'empty' || S.why === 'ram') { if (!BIG) { BIG = mkCanvas(900, 1100); head(BIG.getContext('2d'), 450, 500, 3.4, 1, 0, true); } g.drawImage(BIG, W / 2 + sx - 450 * s / 3.4, H / 2 + 40 + sy - 500 * s / 3.4, 900 * s / 3.4, 1100 * s / 3.4); for (const ex of [-30, 28]) glow(g, W / 2 + sx + ex * s, H / 2 + 40 + sy - 22 * s, 30 * s, '110,240,255', .8); }
+      if (S.why === 'empty' || S.why === 'ram') { prepJaws(); const lunge = Math.min(1, t / .22), J = JAWS[Math.min(3, Math.max(0, (t - .22) / .12 | 0))], k = (s * (.35 + .65 * lunge)) / 3.4, jx = (1 - lunge) * (S.side === 'R' ? 420 : -420) + (R(9) === 0 ? R(60) - 30 : 0);
+        g.save(); g.translate(W / 2 + sx + jx, H / 2 + 40 + sy); g.rotate(Math.sin(t * 37) * .06 + (1 - lunge) * (S.side === 'R' ? .4 : -.4)); g.drawImage(J, -450 * k, -500 * k, 900 * k, 1100 * k); for (const ex of [-30, 28]) { glow(g, ex * 3.4 * k, -22 * 3.4 * k, 120 * k, '110,240,255', .9); glow(g, ex * 3.4 * k, -22 * 3.4 * k, 20 * k, '240,255,255', 1); } g.restore(); }
       g.fillStyle = `rgba(255,20,10,${.15 + .15 * Math.sin(t * 40)})`; g.fillRect(0, 0, W, H);
       for (let i = 0; i < 6; i++) { const y = R(H); g.drawImage(cv, 0, y, W, 20, R(60) - 30, y, W, 20); }
       post(g, T, .25, .7);
@@ -1036,7 +1065,7 @@ export default async function (ctx) {
     const dt = Math.max(0, Math.min(.1, (now - last) / 1000)) * speed;  // la première image de requestAnimationFrame peut dater d'avant « last » last = now;
     buttons = []; sceneT += dt;
     if (!view.isConnected) return;
-    if (scene === 'play') { tick(dt); if (scene === 'play') { S.pan = Math.max(0, Math.min(OW - W, S.pan + panDir() * 900 * dt)); if (S.ca > .5) drawCam(); else drawOffice(); if (S.ca > .02 && S.ca < .98) { g.fillStyle = `rgba(0,0,0,${1 - Math.abs(S.ca - .5) * 2})`; g.fillRect(0, 0, W, H); } post(g, T, S.ca > .5 ? .05 : .09, S.ca > .5 ? .5 : .75); drawHud(); } }
+    if (scene === 'play') { tick(dt); if (scene === 'play') { S.pan = Math.max(0, Math.min(OW - W, S.pan + panDir() * 900 * dt)); if (S.ca > .5) drawCam(); else drawOffice(); if (S.ca > .02 && S.ca < .98) { g.fillStyle = `rgba(0,0,0,${1 - Math.abs(S.ca - .5) * 2})`; g.fillRect(0, 0, W, H); } post(g, T, S.ca > .5 ? .05 : .09, S.ca > .5 ? .5 : .75); if (S.hall > 0 && JAWS) { const J = JAWS[R(4)], k = 1.1 + Math.random() * .3; g.save(); g.globalAlpha = .85; g.drawImage(J, W / 2 - 450 * k / 1.6 + R(40) - 20, H / 2 - 520 * k / 1.6, 900 * k / 1.6, 1100 * k / 1.6); g.restore(); g.fillStyle = 'rgba(120,0,0,.3)'; g.fillRect(0, 0, W, H); for (let i = 0; i < 5; i++) { const y = R(H); g.drawImage(cv, 0, y, W, 24, R(80) - 40, y, W, 24); } } drawHud(); } }
     if (scene === 'title') { T += dt; drawTitle(); post(g, T, .12, .7); }
     else if (scene === 'intro') { T += dt; drawIntro(); }
     else if (scene === 'help') { T += dt; drawHelp(); }
@@ -1052,11 +1081,11 @@ export default async function (ctx) {
 
   // ---------- les commandes ----------
   const toCanvas = e => { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height }; };
-  const toggleCam = () => { if (S.out) return A.deny(); S.cam = !S.cam; if (S.cam) { S.lightL = S.lightR = false; A.camUp(); } else A.camSwitch(); };
+  const toggleCam = () => { if (S.out) return A.deny(); S.cam = !S.cam; if (S.cam) { S.lightL = S.lightR = false; A.camUp(); } else { A.camSwitch(); if (S.ramPos === 'in') die('ram'); } };
   const act = {
-    doorL: () => { if (S.out) return A.deny(); S.doorL = !S.doorL; A.door(S.doorL); }, doorR: () => { if (S.out) return A.deny(); S.doorR = !S.doorR; A.door(S.doorR); },
-    lightL: () => { if (S.out || S.cam) return A.deny(); S.lightL = !S.lightL; S.lightR = false; A.light(S.lightL); }, lightR: () => { if (S.out || S.cam) return A.deny(); S.lightR = !S.lightR; S.lightL = false; A.light(S.lightR); },
-    vent: () => { if (S.out) return A.deny(); S.vent = !S.vent; A.vent(S.vent); },
+    doorL: () => { if (S.out || S.ramPos === 'in') return A.deny(); S.doorL = !S.doorL; A.door(S.doorL); }, doorR: () => { if (S.out || S.ramPos === 'in') return A.deny(); S.doorR = !S.doorR; A.door(S.doorR); },
+    lightL: () => { if (S.out || S.cam || S.ramPos === 'in') return A.deny(); S.lightL = !S.lightL; S.lightR = false; A.light(S.lightL); }, lightR: () => { if (S.out || S.cam || S.ramPos === 'in') return A.deny(); S.lightR = !S.lightR; S.lightL = false; A.light(S.lightR); },
+    vent: () => { if (S.out || S.ramPos === 'in') return A.deny(); S.vent = !S.vent; A.vent(S.vent); },
   };
   cv.addEventListener('pointermove', e => {
     Object.assign(mouse, toCanvas(e), { inside: true });
@@ -1074,7 +1103,7 @@ export default async function (ctx) {
     if (scene === 'six' && sceneT > 3) { if (S.n === 7) scene = 'title'; else start(Math.min(S.n + 1, 6)); return; }
     if (scene !== 'play') return;
     if (S.call && x > W - 300 && x < W - 180 && y > H - 202 && y < H - 176) { S.call = null; A.hush(); return; }
-    if (S.cam) { for (const [id, [mx, my]] of Object.entries(MAP)) if (x > MAPX + mx && x < MAPX + mx + 60 && y > MAPY + my && y < MAPY + my + 28) { S.sel = id; A.camSwitch(); } return; }
+    if (S.cam) { for (const [id, [mx, my]] of Object.entries(MAP)) if (x > MAPX + mx && x < MAPX + mx + 60 && y > MAPY + my && y < MAPY + my + 28) { S.sel = id; S.switchT = .22; A.camSwitch(); } return; }
     const ox = x + S.pan;
     for (const side of ['L', 'R']) { const [px, y1, y2] = PANELS[side]; if (Math.hypot(ox - px, y - y1) < 26) return act['door' + side](); if (Math.hypot(ox - px, y - y2) < 26) return act['light' + side](); }
     if (ox > 880 && ox < 990 && y > 600 && y < 656) return act.vent();
@@ -1086,7 +1115,7 @@ export default async function (ctx) {
     if (k === ' ') { e.preventDefault(); toggleCam(); }
     else if (k === 'q') act.doorL(); else if (k === 'd') act.doorR(); else if (k === 'a') act.lightL(); else if (k === 'e') act.lightR(); else if (k === 'v') act.vent();
     else if (k === 'c' && S.call) { S.call = null; A.hush(); }
-    else if (/^[1-8]$/.test(k) && S.cam) { S.sel = k; A.camSwitch(); }
+    else if (/^[1-8]$/.test(k) && S.cam) { S.sel = k; S.switchT = .22; A.camSwitch(); }
     else if (k === 'escape') { A.hush(); A.ambience(false); scene = 'title'; }
   });
   document.addEventListener('keyup', e => keysDown.delete(e.key));

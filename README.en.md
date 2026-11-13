@@ -18,7 +18,8 @@ The game itself is in French.
 
 ## The three threats
 
-- **Ram Altman** walks from camera to camera up to your doors. Turn on the light: if he stands in the doorway, close it. If he finds an open door, it's over.
+- **Ram Altman** walks from camera to camera up to your doors. In the dark you can't see him: turn on the light, and if he stands in the doorway, close it. If he finds an open door, he comes in: nothing responds any more, and he attacks as soon as you lower the tablet.
+- Sometimes he stares into the camera. Sometimes, from night 3, you see him where he isn't.
 - **The Scalper** sleeps at the loading dock (camera 5). He doesn't move while you watch him. Forget him and he runs down the east hall: right door open, he steals 16 GB; door closed, he bangs on it and it costs power.
 - **The Chips** scratch inside the vent (camera 7). When they reach the hatch above you, close it, or they eat 8 GB.
 

@@ -15,8 +15,11 @@ module.exports = async ({ pj, sleep }) => {
   // nuit 3 : Ram arrive à la porte gauche ouverte, il doit entrer
   await ra(`(r.start(3), r.speed = 40, 0)`);
   for (let i = 0; i < 50 && await ra('r.scene') !== 'play'; i++) await sleep(100);
-  await ra(`(r.speed = 1, r.S.call = null, r.S.ramPos = 'L', r.S.doorWait = .2, 0)`);
-  await sleep(1000);
+  await ra(`(r.speed = 1, r.S.call = null, r.toggleCam(), r.S.ramPos = 'L', r.S.doorWait = .2, 0)`);
+  await sleep(800);
+  if (await ra('r.S.ramPos') !== 'in') throw new Error('Ram devait entrer dans le bureau : ' + await ra('r.S.ramPos'));
+  await ra('(r.toggleCam(), 0)');  // baisser la tablette : il attaque
+  await sleep(300);
   if (await ra('r.scene') !== 'jump') throw new Error('Ram devait entrer : ' + await ra('r.scene'));
-  return 'nuit 1 tenue jusqu\'à 6 h portes fermées, nuit 2 débloquée, Ram entre par une porte ouverte';
+  return 'nuit 1 tenue jusqu\'à 6 h portes fermées, nuit 2 débloquée, Ram entre par une porte ouverte et attaque quand on baisse la tablette';
 };

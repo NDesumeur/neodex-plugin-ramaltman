@@ -16,7 +16,8 @@ Le problème, c'est **Ram Altman**. L'ancien patron de ClosedRAM s'est fait remp
 
 ## Les trois menaces
 
-- **Ram Altman** marche de caméra en caméra jusqu'à tes portes. Allume la lumière : s'il est dans l'encadrement, ferme. S'il trouve une porte ouverte, c'est fini.
+- **Ram Altman** marche de caméra en caméra jusqu'à tes portes. Dans le noir, on ne le voit pas : allume la lumière, et s'il est dans l'encadrement, ferme. S'il trouve une porte ouverte, il entre : plus rien ne répond, et il attaque dès que tu baisses la tablette.
+- Parfois il fixe la caméra. Parfois, à partir de la nuit 3, tu le vois là où il n'est pas.
 - **Le Revendeur** dort au quai de livraison (caméra 5). Tant que tu le regardes, il ne bouge pas. Si tu l'oublies, il court par le couloir est : porte droite ouverte, il te vole 16 Go ; porte fermée, il tape dedans et ça coûte du courant.
 - **Les Puces** grattent dans la gaine de ventilation (caméra 7). Quand elles arrivent au-dessus de toi, ferme la trappe, sinon elles mangent 8 Go.
 
