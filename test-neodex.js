@@ -25,5 +25,14 @@ module.exports = async ({ pj, sleep }) => {
   await ra('(r.toggleCam(), 0)');  // baisser la tablette : il attaque
   await sleep(300);
   if (await ra('r.scene') !== 'jump') throw new Error('Ram devait entrer : ' + await ra('r.scene'));
-  return 'nuit 1 tenue jusqu\'à 6 h portes fermées, nuit 2 débloquée, Ram entre par une porte ouverte et attaque quand on baisse la tablette, journal aux archives, redémarrage des caméras et leurre audio';
+  // nuit 4 : Gérard entre si on reste dans les caméras, et repart quand on baisse la tablette ; une panne de trappe se répare au moniteur
+  await ra(`(r.start(4), r.speed = 40, 0)`);
+  for (let i = 0; i < 50 && await ra('r.scene') !== 'play'; i++) await sleep(100);
+  const gf = await ra(`(r.speed = 1, r.S.call = null, r.S.ramT = -99, r.S.leoT = 1e9, r.toggleCam(), r.S.camHold = 99, r.tick(.05), (() => { const came = !!r.S.ger; r.toggleCam(); const gone = !r.S.ger && r.S.gerSeen > 0; r.S.fault.vent = true; r.act.vent(); const stuck = !r.S.vent; r.repair('vent'); r.tick(2); r.tick(2.1); return [came, gone, stuck, !r.S.fault.vent]; })())`);
+  if (gf.includes(false)) throw new Error('Gérard ou panne : ' + JSON.stringify(gf));
+  // nuit 7 cachée : Léo à la porte gauche ouverte entre et gagne
+  const lw = await ra(`(r.startLeo(), Object.assign(r.L7, { pos: 'L' }), r.L7.door.L = false, r.leoMove('in'), [r.L7.won, r.save.docs.includes('epi')])`);
+  if (lw.includes(false)) throw new Error('nuit de Léo : ' + JSON.stringify(lw));
+  await ra(`(r.scene = 'title', 0)`);
+  return 'nuit 1 tenue jusqu\'à 6 h portes fermées, nuit 2 débloquée, Ram entre par une porte ouverte et attaque quand on baisse la tablette, journal aux archives, redémarrage des caméras et leurre audio, Gérard chassé, trappe réparée, nuit de Léo gagnée';
 };

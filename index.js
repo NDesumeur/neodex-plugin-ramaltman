@@ -565,10 +565,10 @@ function post(g, t, grain = .09, vig = .75) {
 
 // ===== le son : tout est fabriqué en direct par Web Audio (aucun fichier), ronronnement des serveurs, pas, portes, cris =====
 function makeAudio() {
-  let ac = null, master = null, hum = null, muted = false;
+  let ac = null, master = null, hum = null, muted = false, vol = 1;
   const noiseBuf = () => { const b = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; return b; };
   let NB = null;
-  const ctx = () => { if (!ac) { ac = new AudioContext(); master = ac.createGain(); master.gain.value = muted ? 0 : .8; master.connect(ac.destination); NB = noiseBuf(); } if (ac.state === 'suspended') ac.resume(); return ac; };
+  const ctx = () => { if (!ac) { ac = new AudioContext(); master = ac.createGain(); master.gain.value = muted ? 0 : .8 * vol; master.connect(ac.destination); NB = noiseBuf(); } if (ac.state === 'suspended') ac.resume(); return ac; };
   // un bruit filtré, avec son enveloppe
   function noise({ f = 1000, q = 1, type = 'bandpass', dur = .2, vol = .3, at = 0, attack = .005, pan = 0, slide = 0 }) {
     ctx(); const t = ac.currentTime + at, s = ac.createBufferSource(), fl = ac.createBiquadFilter(), g = ac.createGain(), p = ac.createStereoPanner();
@@ -597,7 +597,8 @@ function makeAudio() {
   }
   const A = {
     unlock: ctx, ambience,
-    mute(m) { muted = m; if (master) master.gain.value = m ? 0 : .8; },
+    mute(m) { muted = m; if (master) master.gain.value = m ? 0 : .8 * vol; },
+    setVol(v) { vol = v; if (master) master.gain.value = muted ? 0 : .8 * v; },
     // un pas lourd (métal sur béton), à gauche ou à droite ; près = plus fort
     step(pan = 0, near = .5) { noise({ f: 160, q: 1.4, dur: .22, vol: .18 + near * .4, pan, type: 'lowpass' }); tone({ f: 70, dur: .18, vol: .1 + near * .25, pan, slide: .6 }); noise({ f: 2400, q: 6, dur: .05, vol: .03 + near * .05, pan, at: .02 }); },
     door(close) { noise({ f: close ? 300 : 500, q: .8, dur: .5, vol: .45, type: 'lowpass', slide: close ? .3 : 2 }); tone({ f: close ? 62 : 90, type: 'triangle', dur: .45, vol: .35, slide: .5, at: close ? .32 : 0 }); noise({ f: 3200, q: 12, dur: .7, vol: .05, at: close ? .32 : 0 }); },
@@ -635,7 +636,9 @@ function makeAudio() {
     breath(pan = 0, near = .5) { noise({ f: 420, q: .7, dur: 1.3, vol: .05 + near * .14, attack: .55, pan }); noise({ f: 300, q: .7, dur: 1.1, vol: .04 + near * .12, attack: .45, pan, at: 1.45 }); },
     // une image qui n'aurait pas dû être là
     glitch() { noise({ f: 3000, q: .3, dur: .28, vol: .5, type: 'highpass' }); tone({ f: 90, type: 'sawtooth', dur: .25, vol: .35, slide: 3 }); tone({ f: 1200, type: 'square', dur: .2, vol: .08, slide: .3 }); },
-    lure() { [392, 523.25, 659.25, 783.99].forEach((f, i) => tone({ f, type: 'square', dur: .35, vol: .05, at: i * .12 })); noise({ f: 2000, q: 2, dur: .8, vol: .05, at: .1 }); },
+    // le carillon du leurre ; pan et far : d'où il vient, et de combien loin (étouffé)
+    lure(pan = 0, far = 0) { const k = 1 - far * .7; [392, 523.25, 659.25, 783.99].forEach((f, i) => tone({ f, type: far > .4 ? 'triangle' : 'square', dur: .35, vol: .05 * k, at: i * .12, pan })); noise({ f: 2000 - far * 1200, q: 2, dur: .8, vol: .05 * k, at: .1, pan }); },
+    ring() { for (let k = 0; k < 2; k++) for (let i = 0; i < 12; i++) { tone({ f: 440, dur: .05, vol: .07, at: k * 1.2 + i * .05 }); tone({ f: 480, dur: .05, vol: .05, at: k * 1.2 + i * .05 }); } },
     reboot() { tone({ f: 60, type: 'sawtooth', dur: .6, vol: .12, slide: 4 }); [0, .25, .5].forEach(at => tone({ f: 1800, type: 'square', dur: .05, vol: .04, at })); },
     tick() { tone({ f: 2000, type: 'square', dur: .015, vol: .02 }); },
     click() { tone({ f: 700, type: 'square', dur: .03, vol: .05 }); noise({ f: 3000, q: 4, dur: .03, vol: .05 }); },
@@ -645,7 +648,7 @@ function makeAudio() {
       try {
         if (muted || !window.speechSynthesis) return null;
         const u = new SpeechSynthesisUtterance(text), v = speechSynthesis.getVoices().filter(v => /^fr/i.test(v.lang));
-        u.lang = 'fr-FR'; if (v.length) u.voice = v[opts.alt ? v.length - 1 : 0]; u.rate = opts.rate || 1; u.pitch = opts.pitch || 1; u.volume = opts.vol ?? .9;
+        u.lang = 'fr-FR'; if (v.length) u.voice = v[opts.alt ? v.length - 1 : 0]; u.rate = opts.rate || 1; u.pitch = opts.pitch || 1; u.volume = Math.min(1, (opts.vol ?? .9) * (A.voice ?? 1));
         speechSynthesis.speak(u); return u;
       } catch { return null; }
     },
@@ -668,6 +671,7 @@ const CALLS = {
     "Il marche la nuit. Surveille les caméras avec la barre en bas de l'écran. S'il est à ta porte, ferme-la. Les boutons sont à côté de chaque porte, la lumière aussi. Q et D pour les portes, A et E pour les lumières.",
     "Mais attention : tout ça mange du courant. Plus de courant, plus de portes. Et lui, il sourit toujours. Bonne première nuit."],
   2: ["Allô ? Bravo pour hier. Le précédent n'avait pas passé la première nuit. Bref.",
+    "Le bâtiment est vieux : parfois la trappe se bloque, ou le courant fuit. Le moniteur du bureau te dit ce qui est en panne ; tu répares une chose à la fois.",
     "Ce soir, le Revendeur se réveille. Il dort au quai de livraison, caméra cinq. Tant que tu le regardes, il ne bouge pas. Si tu l'oublies, il part en courant par le couloir est.",
     "S'il arrive et que ta porte droite est ouverte, il te pique seize gigas. Si elle est fermée, il tape dedans et ça te coûte du courant. Regarde-le de temps en temps, voilà."],
   3: ["Allô ? Bon, mauvaise nouvelle : les Puces. De petites bêtes faites d'une barrette, avec des pattes. Elles remontent par la gaine de ventilation, caméra sept.",
@@ -676,7 +680,8 @@ const CALLS = {
     "Autre chose : la nuit, il pirate parfois les caméras. Si l'écran dit « accès refusé », redémarre-les depuis le moniteur du bureau, touche R. Et si tu as besoin de l'éloigner, le leurre audio de la tablette joue un petit carillon dans la pièce que tu regardes. Il adore ce son. Il dit qu'il s'en souvient.",
     "Ah, et si tu trouves des papiers qui traînent sur les caméras… ramasse-les. Le patron, monsieur Octet, il avait un fils. On n'en parle pas, ici."],
   4: ["Allô ? Allô ? Je… je n'ai pas beaucoup de temps. Il m'a parlé, hier. Par la grille. Il disait qu'il voulait juste emprunter. Juste une barrette.",
-    "Ne lui ouvre pas. Il ne rend jamais rien. Il… attends. Tu entends ce sourire ?"],
+    "Ne lui ouvre pas. Il ne rend jamais rien. Et ne te fie pas à tes oreilles : il sait faire le carillon, maintenant. Il sait faire le bruit de ses pas ailleurs.",
+    "Si tu me vois dans le bureau… dis-moi de partir. Baisse ta tablette. Je ne sais plus toujours où je suis. Je cherche Léo. Il… attends. Tu entends ce sourire ?"],
   5: ["… … Bonjour. C'est Ram. Gérard ne viendra plus. Il a partagé sa RAM. C'était très généreux.",
     "Je ne suis pas méchant, tu sais. Je veux seulement que toute la mémoire du monde travaille ensemble. Dans mes serveurs.",
     "Ouvre la porte. On en parle. Je souris, regarde."],
@@ -687,12 +692,19 @@ const FRAGS = [
   ['f1', 'Badge d\'employé', 'CLOSEDRAM — Ingénieur n° 1\nLÉO OCTET\nAccès : laboratoire PILE, tous niveaux.\n\nLa photo a été grattée. Quelqu\'un a dessiné un sourire par-dessus, au feutre.'],
   ['f2', 'Note sur le frigo', 'Léo n\'est pas rentré. Raymond dit qu\'il travaille tard sur la PILE.\nIl souriait en le disant.\nJe n\'aime pas quand il sourit.\n\n— Gérard, 13 novembre 1987'],
   ['f3', 'Brevet n° 87-1113', 'Procédé de sauvegarde intégrale d\'une conscience humaine sur mémoire vive.\nCapacité requise : 64 Go.\nÉtat de l\'art en 1987 : 640 Ko.\n\nInventeurs : R. Altman, L. Octet.'],
-  ['f4', 'Journal de test n° 12', 'Sujet : L.O.   Transfert : 61 %.\nLe sujet demande où est son père.\nLe sujet demande pourquoi il ne sent plus ses mains.\nLe sujet demande qui est l\'homme qui sourit dans le miroir.\n\nNote de R.A. : « Il faut plus de mémoire. »'],
+  ['f4', 'Journal de test n° 12 (cassette)', 'Sujet : L.O.   Transfert : 61 %.\nLe sujet demande où est son père.\nLe sujet demande pourquoi il ne sent plus ses mains.\nLe sujet demande qui est l\'homme qui sourit dans le miroir.\n\nNote de R.A. : « Il faut plus de mémoire. »'],
   ['f5', 'Bon de commande', '1 masque facial en silicone, modèle « R.A. »\nExpression : sourire, permanent.\nYeux : à fournir par le client.\n\nLivraison : Octet & Fils, porte de service, de nuit.'],
-  ['f6', 'Message vocal (transcrit)', '« Papa ? C\'est moi. Je crois.\nIl me manque des bouts. Des prénoms. Ta voix.\nIl dit que s\'il trouve assez de RAM, je me souviendrai de tout.\nIl dit que ce n\'est pas lui qui a peur d\'oublier. C\'est moi. »'],
+  ['f6', 'Message vocal (cassette)', '« Papa ? C\'est moi. Je crois.\nIl me manque des bouts. Des prénoms. Ta voix.\nIl dit que s\'il trouve assez de RAM, je me souviendrai de tout.\nIl dit que ce n\'est pas lui qui a peur d\'oublier. C\'est moi. »'],
   ['f7', 'Facture du Revendeur', 'Rachat de 4 000 barrettes, payé comptant.\nClient : M. R. Altman.\n\nNote du vendeur : « Le client a insisté. Il en faut toujours plus.\nIl oublie ce qu\'il a acheté la veille. »'],
   ['f8', 'Photo déchirée', 'Deux jeunes hommes devant un garage, 1987.\nL\'un sourit. L\'autre a les yeux bleus.\n\nAu dos : « Raymond et moi, le jour où la PILE a démarré.\nSi un jour je ne me souviens plus, garde-la, papa. — L. »'],
 ];
+const TAPES = ['f4', 'f6'];  // ces deux fragments sont des cassettes : on peut les écouter
+const EPI = ['Épilogue : Léo', 'Tu poses la main de métal sur la vitrine. Le veilleur ne crie pas. Il recule, puis il ouvre.\n\n64 Go. Tout revient d\'un coup : l\'odeur du garage, la voix de papa, ton prénom.\nLéo. Tu t\'appelles Léo.\n\nLe masque glisse et tombe. Dessous, il n\'y a pas de sourire.\n\nSur le répondeur de Gérard, un dernier message, ce matin-là : « Papa ? Je suis rentré. »'];
+// pour les sons : distance au bureau (0 = à la porte) et côté (gauche −1, droite +1)
+const DIST = { 1: 4, 2: 3, 5: 4, 7: 3, 8: 3, 3: 2, 6: 2, 4: 1, L: 0, R: 0 }, PAN = { 1: 0, 2: 0, 5: .7, 7: .1, 8: -.6, 3: -.6, 6: .6, 4: -.8, L: -.9, R: .9 };
+const LEO_ROOMS = ['1', '2', '8', '3', '4', '6', 'L', 'R'], MAP_DOORS = { L: [30, 246], R: [226, 246] };
+const CHALL = ['SANS LEURRE', 'COURANT À 50 %', 'TABLETTE LENTE'];
+const FIXL = { cams: 'CAMÉRAS PIRATÉES', vent: 'TRAPPE BLOQUÉE', leak: 'FUITE DE COURANT' }, FIXK = { cams: 'R', vent: 'T', leak: 'P' };
 const NEWS = {
   1: ['Le Courrier du Soir, 14 novembre 1987', 'DISPARITION D\'UN JEUNE INGÉNIEUR\n\nLéo Octet, 24 ans, n\'est pas rentré chez son père après une nuit au laboratoire de la jeune société ClosedRAM. Son associé, Raymond Altman, se dit « confiant » : « Léo est très présent. »'],
   2: ['Le Courrier du Soir, 3 mars 1994', 'CLOSEDRAM RACHÈTE TOUTE LA MÉMOIRE DU PAYS\n\nEn une semaine, la société de Raymond Altman a acheté tous les stocks de barrettes. Son patron, que personne n\'a vu depuis des années, répond par écrit : « La mémoire doit travailler ensemble. »'],
@@ -725,8 +737,9 @@ export default async function (ctx) {
   const rooms = buildRooms(), office = buildOffice(), A = makeAudio();
   const SCAN = (() => { const c = mkCanvas(W, H), s = c.getContext('2d'); s.fillStyle = 'rgba(0,0,0,.22)'; for (let y = 0; y < H; y += 3) s.fillRect(0, y, W, 1); return c; })();
   // la sauvegarde : nuit atteinte, étoiles, nuit perso
-  const save = { night: 1, stars: 0, custom: [10, 10, 10], docs: [], ...(await folder.read('progression').catch(() => null) || {}) };
+  const save = { night: 1, stars: 0, custom: [10, 10, 10], docs: [], chall: [false, false, false], medals: [], ...(await folder.read('progression').catch(() => null) || {}) };
   const keep = () => folder.write('progression', save).catch(() => {});
+  save.opts = { sfx: 1, voice: 1, pan: 1, calm: false, ...save.opts }; A.setVol(save.opts.sfx); A.voice = save.opts.voice;
 
   // ---------- état ----------
   let scene = 'title', sceneT = 0, T = 0, S = null, mouse = { x: W / 2, y: H / 2, down: false }, hoverBar = false, speed = 1, menuSel = 0, msg = null;
@@ -735,7 +748,8 @@ export default async function (ctx) {
     const [ra, sc, ch] = ai || NIGHTS[Math.min(n, 6)];
     S = { n, time: 0, hourLen: 60, power: 100, ram: 64, pan: 320, doorL: false, doorR: false, dl: 0, dr: 0, lightL: false, lightR: false, vent: false, va: 0,
       cam: false, ca: 0, sel: 1, ai: { ram: ra, sc, ch }, ramPos: '1', ramT: 0, doorWait: 0, scStage: 0, scRun: 0, scT: 0, scLock: 0, chPos: 0, chT: 0, chWait: 0,
-      disrupt: 0, flick: 0, out: 0, outPhase: 0, inside: 0, ramVar: 0, frag: null, fragT: 25 + Math.random() * 150, fragN: 0, lure: null, lureCd: 0, hacked: false, reboot: 0, camOx: 0, newDoc: null, breathT: 0, hallT: 40 + Math.random() * 50, hall: 0, switchT: 0, call: CALLS[Math.min(n, 6)] && !ai ? { lines: CALLS[Math.min(n, 6)], i: 0, t: 0 } : null, steal: null, said: 0, events: [], usage: 1, hourBumps: 0 };
+      disrupt: 0, flick: 0, out: 0, outPhase: 0, inside: 0, ramVar: 0, frag: null, fragT: 25 + Math.random() * 150, fragN: 0, lure: null, lureCd: 0, hacked: false, fix: null, fault: { vent: false, leak: false }, faultT: 45 + Math.random() * 70, mark: null, fakeT: 15 + Math.random() * 20, leoT: n >= 2 && n < 7 ? 70 + Math.random() * 150 : 1e9, camHold: 0, ger: null, gerSeen: 0, ch: n === 7 ? [...save.chall] : [false, false, false], tuto: n === 1 && !ai && !save.tuto ? 0 : -1, camOx: 0, newDoc: null, breathT: 0, hallT: 40 + Math.random() * 50, hall: 0, switchT: 0, call: CALLS[Math.min(n, 6)] && !ai ? { lines: CALLS[Math.min(n, 6)], i: 0, t: 0 } : null, steal: null, said: 0, events: [], usage: 1, hourBumps: 0 };
+    if (S.ch[1]) S.power = 50;
     scene = 'card'; sceneT = 0; setTimeout(prepJaws, 50);  // l'écran de la nuit laisse le temps de préparer le saut au visage
   }
   // les images du saut au visage, bouche de plus en plus ouverte, dessinées une seule fois
@@ -746,6 +760,9 @@ export default async function (ctx) {
   const headClose = () => HEADC || (HEADC = (() => { const c = mkCanvas(560, 640); head(c.getContext('2d'), 280, 300, 2.2, .7, 0, false); return c; })());
   const ramAt = id => S.ramPos === id;
   const flash = (text, col = '#ff5a4a') => { msg = { text, col, t: 2.4 }; };
+  // un pas de Ram dans une pièce : plus fort s'il est près, à gauche ou à droite selon la pièce
+  const stepAt = id => A.step(PAN[id] || 0, 1 - (DIST[id] ?? 4) / 4);
+  const faults = () => [S.hacked && 'cams', S.fault.vent && 'vent', S.fault.leak && 'leak'].filter(Boolean);
 
   // ---------- la nuit qui avance ----------
   function tick(dt) {
@@ -756,14 +773,16 @@ export default async function (ctx) {
     if (hour >= 2 && S.hourBumps < hour - 1 && hour <= 4) { S.hourBumps++; S.ai.ram = Math.min(20, S.ai.ram + 1); if (S.n >= 3) { S.ai.sc = Math.min(20, S.ai.sc + 1); S.ai.ch = Math.min(20, S.ai.ch + 1); } }
     // les portes, la trappe, la tablette : animations
     S.dl += ((S.doorL ? 1 : 0) - S.dl) * Math.min(1, dt * 12); S.dr += ((S.doorR ? 1 : 0) - S.dr) * Math.min(1, dt * 12); S.va += ((S.vent ? 1 : 0) - S.va) * Math.min(1, dt * 10);
-    S.ca += ((S.cam ? 1 : 0) - S.ca) * Math.min(1, dt * 14);
+    S.ca += ((S.cam ? 1 : 0) - S.ca) * Math.min(1, dt * (S.ch[2] ? 3 : 14));  // défi « tablette lente »
+    if (S.mark && (S.mark.t -= dt) <= 0) S.mark = null;
+    if (S.gerSeen > 0) S.gerSeen -= dt;
     if (S.disrupt > 0) S.disrupt -= dt;
     if (msg && (msg.t -= dt) <= 0) msg = null;
     if (S.steal && (S.steal.t -= dt) <= 0) S.steal = null;
     if (S.call) { S.call.t += dt; }
     // le courant
     if (!S.out) {
-      S.usage = Math.min(5, 1 + S.doorL + S.doorR + S.vent + (S.lightL || S.lightR ? 1 : 0) + (S.cam ? 1 : 0) + (S.reboot > 0 ? 1 : 0));
+      S.usage = Math.min(5, 1 + S.doorL + S.doorR + S.vent + (S.lightL || S.lightR ? 1 : 0) + (S.cam ? 1 : 0) + (S.fix ? 1 : 0) + (S.fault.leak ? 2 : 0));
       const base = .085 + S.n * .006 + (S.n >= 2 ? .01 : 0);
       S.power -= S.usage * base * dt;
       if (S.power <= 0) powerOut();
@@ -771,13 +790,15 @@ export default async function (ctx) {
     // la lumière d'une porte grésille quand quelqu'un est derrière
     if ((S.lightL && ramAt('L')) || (S.lightR && ramAt('R'))) { if (R(8) === 0) A.buzz(); }
     // ---- Ram : une chance de bouger toutes les 5 s environ
+    // le tutoriel de la première nuit : Ram attend qu'on ait fini
+    if (S.tuto >= 0) { S.ramT = 0; if (TUTO[S.tuto][1]()) { S.tuto++; A.tick(); if (S.tuto >= TUTO.length) { S.tuto = -1; save.tuto = 1; keep(); } } }
     S.ramT += dt;
     if (S.ramT >= 4.97) {
       S.ramT -= 4.97;
       if (!/[LR]|in/.test(S.ramPos) && R(20) < S.ai.ram) {
         const opts = RAM_NEXT[S.ramPos].filter(id => S.n >= 3 || id !== '6'), to = opts[R(opts.length)], from = S.ramPos;
         S.ramPos = to; S.ramVar = /[368]/.test(to) && R(3) === 0 ? 1 : 0; if (S.n >= 2 && /[12]/.test(to) && !S.hacked && R(40) < S.ai.ram) { S.hacked = true; A.glitch(); if (S.cam) S.disrupt = .8; } if (S.cam && (S.sel == from || S.sel == to)) S.disrupt = 1.6;  // la caméra qu'on regarde décroche quand il passe
-        if (/[346LR]/.test(to)) A.step(/[34L]/.test(to) ? -.8 : .8, /[LR]/.test(to) ? 1 : .5);
+        stepAt(to); if (/[3468]/.test(to)) S.mark = { cam: to, t: 2.5, k: 'pas' };  // les micros des pièces proches entendent ses pas
         if (/[LR]/.test(to)) { S.doorWait = Math.max(2.6, 7.5 - S.ai.ram * .22); if (R(3) === 0) ramLine(); }
       }
     }
@@ -793,7 +814,7 @@ export default async function (ctx) {
     }
     if (S.ramPos === 'in') { S.inside -= dt; S.flick = .2; if (R(40) === 0) A.breath(0, 1); if (S.inside <= 0) return die('ram'); }
     // les hallucinations : à partir de la nuit 3, son visage passe parfois devant tes yeux
-    if (S.n >= 3 || S.ai.ram >= 10) { S.hallT -= dt; if (S.hallT <= 0) { S.hallT = 35 + Math.random() * 60; S.hall = .2; A.glitch(); } }
+    if (!save.opts.calm && (S.n >= 3 || S.ai.ram >= 10)) { S.hallT -= dt; if (S.hallT <= 0) { S.hallT = 35 + Math.random() * 60; S.hall = .2; A.glitch(); } }
     if (S.hall > 0) S.hall -= dt; if (S.switchT > 0) S.switchT -= dt;
     // un fragment apparaît quelques secondes dans une caméra (au plus deux par nuit, tant qu'il en reste à trouver)
     const left = FRAGS.filter(f => !save.docs.includes(f[0]));
@@ -803,9 +824,22 @@ export default async function (ctx) {
     if (S.lureCd > 0) S.lureCd -= dt;
     if (S.lure && (S.lure.t -= dt) <= 0) { const c = S.lure.cam; S.lure = null;
       if (c === '7') { if (S.chPos) { S.chPos = Math.max(0, S.chPos - 2); A.skitter(.2); } }
-      else if ((ADJ[c] || []).includes(S.ramPos) && R(10) < 8) { const from = S.ramPos; S.ramPos = c; S.ramVar = 0; S.ramT = 0; if (/[LR]/.test(from)) A.step(from === 'L' ? -.6 : .6, .4); if (S.cam && S.sel == c) S.disrupt = 1; } }
+      else if ((ADJ[c] || []).includes(S.ramPos) && R(10) < 8) { S.ramPos = c; S.ramVar = 0; S.ramT = 0; stepAt(c); if (S.cam && S.sel == c) S.disrupt = 1; } }
     // le piratage : branché au réseau (caméras 1 et 2), il coupe tes caméras ; on les redémarre depuis le moniteur
-    if (S.reboot > 0 && (S.reboot -= dt) <= 0) { S.hacked = false; A.chime(); }
+    if (S.fix && (S.fix.t -= dt) <= 0) { if (S.fix.w === 'cams') S.hacked = false; else S.fault[S.fix.w] = false; S.fix = null; A.light(true); flash('Réparé', '#7ee07a'); }
+    // les pannes : la trappe qui se bloque, le courant qui fuit (à partir de la nuit 2)
+    if (S.n >= 2 && (S.faultT -= dt) <= 0) { S.faultT = 45 + Math.random() * 70; const w = ['vent', 'leak'].filter(k => !S.fault[k])[R(2)]; if (w) { S.fault[w] = true; A.glitch(); flash(w === 'vent' ? 'Panne : la trappe est bloquée (moniteur, T)' : 'Panne : fuite de courant (moniteur, P)', '#ffd84a'); } }
+    // à partir de la nuit 4, il imite : un carillon ou des pas dans une pièce où il n'est pas
+    if (S.n >= 4) { S.fakeT -= dt; if (S.fakeT <= 0) { S.fakeT = 16 + Math.random() * 28; const ids = ['1', '2', '3', '4', '6', '8'].filter(id => id !== S.ramPos), id = ids[R(ids.length)];
+      if (R(2)) { A.lure(PAN[id], DIST[id] / 4); S.mark = { cam: id, t: 3, k: '♪' }; } else { stepAt(id); S.mark = { cam: id, t: 2.5, k: 'pas' }; } } }
+    // le téléphone sonne en pleine nuit : c'est Léo, et il ne dit pas toujours vrai
+    if (!S.call && (S.leoT -= dt) <= 0) { S.leoT = 1e9; A.ring();
+      const truth = R(10) < 7, others = ['1', '2', '3', '4', '6', '8'].filter(id => id !== S.ramPos), where = truth ? S.ramPos : others[R(others.length)];
+      const hint = where === 'in' ? 'Il est derrière toi.' : /[LR]/.test(where) ? 'Il est à ta porte ' + (where === 'L' ? 'gauche' : 'droite') + '. Il attend.' : 'Il est à la caméra ' + where + '. ' + rooms[where].name.toLowerCase() + '. Je l\'entends penser.';
+      S.call = { lines: ['… Allô ? Papa ? … Non. Tu n\'es pas papa.', hint, R(2) ? 'Je ne sais plus si je mens. Il me manque des bouts.' : 'Ne le laisse pas prendre la Pile. C\'est moi, dedans.'], i: 0, t: -2.6, leo: true }; }
+    // Gérard : à force de rester dans les caméras, il entre dans le bureau ; on le fait partir en baissant la tablette
+    if (S.n >= 4) { if (S.cam && !S.ger) { S.camHold += dt; if (S.camHold > Math.max(7, 15 - S.n)) { S.ger = 3.4; A.breath(0, .9); A.say('Léo ?', { rate: .7, pitch: .6, vol: .4 }); } } else if (!S.cam) S.camHold = 0;
+      if (S.ger && S.cam && (S.ger -= dt) <= 0) { S.ger = null; S.camHold = 0; stealRam(8, 'gerard'); } }
     // ---- le Revendeur : il prépare son coup quand on ne le regarde pas
     S.scT += dt; if (S.scLock > 0) S.scLock -= dt;
     const watching = S.cam && S.sel == 5;
@@ -833,9 +867,9 @@ export default async function (ctx) {
     if (S.flick > 0) S.flick -= dt; else if (R(400) === 0) S.flick = .15 + Math.random() * .4;
   }
   function stealRam(n, who) {
-    S.ram = Math.max(0, S.ram - n); A.steal(); if (who === 'chips') A.skitter(1);
+    S.ram = Math.max(0, S.ram - n); A.steal(); if (who === 'chips') A.skitter(1); if (who === 'gerard') flash('Gérard a pris une barrette « pour Léo » : −8 Go', '#ff5a4a');
     S.steal = { who, t: who === 'scalper' ? 1.1 : 1.4, n };
-    flash(`−${n} Go de RAM`, '#ff5a4a');
+    if (who !== 'gerard') flash(`−${n} Go de RAM`, '#ff5a4a');
     if (S.ram <= 0) die('empty');
   }
   const RAM_LINES = ['Juste une petite barrette…', 'Tu n\'as pas besoin de toute cette mémoire.', 'On partage ? Je souris, regarde.', 'Toute la RAM du monde. La tienne aussi.', 'Ouvre. C\'est pour l\'avenir.'];
@@ -857,11 +891,12 @@ export default async function (ctx) {
     A.hush(); A.ambience(false); A.chime(); scene = 'six'; sceneT = 0;
     if (S.n < 7) { if (!save.docs.includes('j' + S.n)) save.docs.push('j' + S.n); if (S.n === 6 && FRAGS.every(f => save.docs.includes(f[0])) && !save.docs.includes('fin')) { save.docs.push('fin'); S.trueEnd = true; } save.night = Math.max(save.night, Math.min(S.n + 1, 6)); if (S.n === 5) save.stars = Math.max(save.stars, 1); if (S.n === 6) save.stars = Math.max(save.stars, 2); }
     if (S.n === 7 && S.ai.ram >= 20 && S.ai.sc >= 20 && S.ai.ch >= 20) save.stars = 3;
+    if (S.n === 7 && S.ai.ram >= 10 && S.ai.sc >= 10 && S.ai.ch >= 10) S.ch.forEach((on, i) => { if (on && !save.medals.includes(i)) save.medals.push(i); });
     keep();
   }
   function die(why) {
     if (scene !== 'play') return;
-    A.hush(); A.ambience(false); scene = 'jump'; sceneT = 0; S.why = why; S.side = S.ramPos === 'R' ? 'R' : 'L'; A.scream();
+    A.hush(); A.ambience(false); scene = 'jump'; sceneT = 0; S.why = why; S.side = S.ramPos === 'R' ? 'R' : 'L'; if (save.opts.calm) return A.glitch(); A.scream();
     setTimeout(() => A.say(why === 'empty' ? 'Merci pour toute ta RAM.' : 'Ta RAM. Enfin.', { rate: .8, pitch: .4, alt: true }), 1700);
   }
 
@@ -928,21 +963,22 @@ export default async function (ctx) {
     g.fillStyle = '#c8c8c0'; g.font = 'bold 11px Arial'; g.fillText('TRAPPE (V)', tx + 18, 672);
     // l'écran du bureau
     const mx = 560 - p; g.fillStyle = dark ? '#000' : 'rgba(40,120,90,.25)'; g.fillRect(mx + 10, 420, 220, 140);
-    if (!dark) { g.fillStyle = '#7ef0b4'; g.font = '14px Consolas, monospace'; ['OCTET & FILS', 'NUIT ' + S.n, 'PILE : ' + S.ram + ' Go', 'COURANT : ' + Math.max(0, S.power | 0) + ' %'].forEach((l, i) => g.fillText(l, mx + 22, 446 + i * 22));
-      if (S.reboot > 0) { g.fillText('REDÉMARRAGE CAMÉRAS', mx + 22, 534); g.fillStyle = '#1a4a34'; g.fillRect(mx + 22, 542, 190, 10); g.fillStyle = '#7ef0b4'; g.fillRect(mx + 22, 542, 190 * (1 - S.reboot / 4), 10); }
-      else if (S.hacked) { g.fillStyle = T % .8 < .5 ? '#ff5a4a' : '#7a2a24'; g.fillText('CAMÉRAS PIRATÉES', mx + 22, 534); g.fillText('[R] OU CLIC : REDÉMARRER', mx + 22, 552); }
-      else g.fillText(T % 1 < .5 ? '> _' : '>', mx + 22, 534); }
+    if (!dark) { g.fillStyle = '#7ef0b4'; g.font = '14px Consolas, monospace'; const fl = faults(); ['OCTET & FILS · NUIT ' + S.n, 'PILE ' + S.ram + ' Go · COURANT ' + Math.max(0, S.power | 0) + ' %'].forEach((l, i) => g.fillText(l, mx + 22, 446 + i * 22));
+      if (S.fix) { g.fillText('RÉPARATION : ' + FIXL[S.fix.w], mx + 22, 498); g.fillStyle = '#1a4a34'; g.fillRect(mx + 22, 508, 190, 10); g.fillStyle = '#7ef0b4'; g.fillRect(mx + 22, 508, 190 * (1 - S.fix.t / 4), 10); }
+      else if (fl.length) fl.forEach((w, i) => { g.fillStyle = T % .8 < .5 ? '#ff5a4a' : '#c0483a'; g.fillText('[' + FIXK[w] + '] ' + FIXL[w], mx + 22, 498 + i * 22); });
+      else g.fillText(T % 1 < .5 ? '> tout marche _' : '> tout marche', mx + 22, 498); }
     // la lumière de la pièce : la lampe du bureau, qui vacille ; noir presque total sans courant
     const lamp = S.out ? 0 : S.flick > 0 ? (S.ramPos === 'in' ? Math.random() * .5 : .35 + Math.random() * .3) : 1;
     g.fillStyle = rad(g, 960 - p, 520, 40, 1050, [[0, `rgba(0,0,0,${.15 + (1 - lamp) * .6})`], [.5, `rgba(0,0,0,${.5 + (1 - lamp) * .4})`], [1, `rgba(0,0,0,${.88 + (1 - lamp) * .1})`]]); g.fillRect(0, 0, W, H);
     if (S.ramPos === 'in') { const sx = 960 - p + Math.sin(T * 1.3) * 40; soft(g, 18, () => blobPath(g, [sx - 300, 600, sx - 230, 340, sx - 100, 270, sx - 80, 140, sx, 80, sx + 80, 140, sx + 100, 270, sx + 230, 340, sx + 300, 600]), 'rgba(0,0,0,.88)');
       if (R(3)) for (const ex of [-26, 24]) glow(g, sx + ex, 150, 16, '110,240,255', .8); }
+    if (S.gerSeen > 0) drawGerard(960 - p, 470, 1.5, Math.min(1, S.gerSeen) * (R(6) ? 1 : .4));
     if (S.out) { g.fillStyle = 'rgba(0,0,0,.9)'; g.fillRect(0, 0, W, H); if (S.outPhase === 1) { const x = DOOR_L.x - p + DOOR_L.w / 2; ramGlow(g, x, DOOR_Y + DOOR_H + 30, .68, 'lean', .8 + .4 * Math.sin(T * 9)); } }
     // une Puce ou le Revendeur qui vient de voler
     if (S.steal) {
       const k = S.steal.t;
       if (S.steal.who === 'scalper') { litChar(g, (cg, a, b, s) => drawScalper(cg, a, b, s, 'run', .9, T), W * .62 + Math.sin(T * 40) * 8, H + 200, 1.15, 1, .4, 'scrun' + (T * 12 | 0) % 6); g.fillStyle = `rgba(255,40,30,${k * .25})`; g.fillRect(0, 0, W, H); }
-      else for (let i = 0; i < 5; i++) drawChip(g, 1100 - p + i * 40 - k * 200 * (i % 2 ? 1 : -1), 530 + (i % 2) * 20, .9, .7, T, i);
+      else if (S.steal.who === 'chips') for (let i = 0; i < 5; i++) drawChip(g, 1100 - p + i * 40 - k * 200 * (i % 2 ? 1 : -1), 530 + (i % 2) * 20, .9, .7, T, i);
     }
   }
 
@@ -983,34 +1019,52 @@ export default async function (ctx) {
     if (T % 1.2 < .7) ell(g, 42, 92, 9, 9, '#ff2a2a'); g.fillStyle = '#eee'; g.font = 'bold 20px Consolas, monospace'; g.fillText('REC', 58, 99);
     g.font = 'bold 24px Consolas, monospace'; g.fillText('CAM ' + id + ' · ' + room.name, 30, 136);
     const sec = S.time / S.hourLen * 3600 | 0; g.font = '16px Consolas, monospace'; g.fillStyle = 'rgba(230,230,230,.75)'; g.fillText(`${String(sec / 3600 | 0).padStart(2, '0')}:${String(sec / 60 % 60 | 0).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}  1987-11-13`, 30, 162);
+    if (S.ger) { const k = 1 - S.ger / 3.4; drawGerard(330, 470, 1.5, .15 + k * .5); if (T % .6 < .4) { g.fillStyle = '#ff5a4a'; g.font = 'bold 22px Consolas, monospace'; g.fillText('QUELQU\'UN RESPIRE DERRIÈRE TOI', 30, 200); } }
     drawMap();
     // l'écran piraté : plus d'image, plus de leurre, tant qu'on n'a pas redémarré depuis le bureau
     if (S.hacked) { g.fillStyle = 'rgba(0,0,0,.92)'; g.fillRect(0, 0, W, H - 60); g.save(); g.globalAlpha = .25; g.drawImage(NOISE[(T * 30 | 0) % 4], 0, 0, W, H - 60); g.restore(); drawMap();
       g.fillStyle = T % 1 < .6 ? '#ff5a4a' : '#7a2a24'; g.font = 'bold 40px Consolas, monospace'; g.textAlign = 'center'; g.fillText('ACCÈS REFUSÉ', (MAPX - 20) / 2, H / 2 - 30);
-      g.fillStyle = '#ccc'; g.font = '18px Consolas, monospace'; g.fillText(S.reboot > 0 ? 'redémarrage en cours…' : 'Redémarre les caméras depuis le moniteur du bureau (R)', (MAPX - 20) / 2, H / 2 + 10); g.fillStyle = '#7ef0b4'; g.fillText('« Je vois tout, maintenant. »', (MAPX - 20) / 2, H / 2 + 50); g.textAlign = 'left'; }
+      g.fillStyle = '#ccc'; g.font = '18px Consolas, monospace'; g.fillText(S.fix && S.fix.w === 'cams' ? 'redémarrage en cours…' : 'Redémarre les caméras depuis le moniteur du bureau (R)', (MAPX - 20) / 2, H / 2 + 10); g.fillStyle = '#7ef0b4'; g.fillText('« Je vois tout, maintenant. »', (MAPX - 20) / 2, H / 2 + 50); g.textAlign = 'left'; }
     // le bouton du leurre audio, au-dessus de la carte
-    const lx = MAPX - 10, ly = MAPY - 58, ready = S.lureCd <= 0 && !S.hacked;
+    const lx = MAPX - 10, ly = MAPY - 58, ready = S.lureCd <= 0 && !S.hacked && !S.ch[0];
     rrect(g, lx, ly, 330, 40, 6, ready ? 'rgba(126,240,180,.18)' : 'rgba(255,255,255,.06)', ready ? '#7ef0b4' : '#555', 2);
-    g.fillStyle = ready ? '#7ef0b4' : '#888'; g.font = 'bold 15px Arial'; g.textAlign = 'center'; g.fillText(S.lure ? '♪ LE CARILLON JOUE…' : ready ? '♪ LEURRE AUDIO SUR CAM ' + id + ' (L)' : S.hacked ? 'LEURRE HORS LIGNE' : 'LEURRE : ' + Math.ceil(S.lureCd) + ' s', lx + 165, ly + 26); g.textAlign = 'left';
+    g.fillStyle = ready ? '#7ef0b4' : '#888'; g.font = 'bold 15px Arial'; g.textAlign = 'center'; g.fillText(S.lure ? '♪ LE CARILLON JOUE…' : ready ? '♪ LEURRE AUDIO SUR CAM ' + id + ' (L)' : S.ch[0] ? 'LEURRE INTERDIT (DÉFI)' : S.hacked ? 'LEURRE HORS LIGNE' : 'LEURRE : ' + Math.ceil(S.lureCd) + ' s', lx + 165, ly + 26); g.textAlign = 'left';
   }
   // ramasser un fragment ; jouer le leurre
   function pickFrag(x, y) {
     if (!S.frag || S.frag.cam !== String(S.sel) || S.hacked) return false;
     const sx = (S.frag.x - W / 2 - S.camOx) * 1.08 + W / 2, sy = (S.frag.y - H / 2) * 1.08 + H / 2;
     if (Math.hypot(x - sx, y - sy) > 46) return false;
-    save.docs.push(S.frag.id); keep(); S.newDoc = S.frag.id; A.chime(); flash('Fragment trouvé : ' + FRAGS.find(f => f[0] === S.frag.id)[1] + ' (Archives)', '#ffd84a'); S.frag = null; return true;
+    save.docs.push(S.frag.id); keep(); S.newDoc = S.frag.id; A.chime(); flash((TAPES.includes(S.frag.id) ? 'Cassette trouvée : ' : 'Fragment trouvé : ') + FRAGS.find(f => f[0] === S.frag.id)[1] + ' (Archives)', '#ffd84a'); S.frag = null; return true;
   }
   function lure() {
-    if (!S.cam || S.hacked || S.lureCd > 0) return A.deny();
+    if (!S.cam || S.hacked || S.lureCd > 0 || S.ch[0]) return A.deny();
     S.lure = { cam: String(S.sel), t: 2 }; S.lureCd = 14; S.power -= 1.5; A.lure();
   }
-  function drawMap() {
+  function drawMap(Lv) {
     rrect(g, MAPX - 10, MAPY - 10, 330, 290, 6, 'rgba(0,0,0,.55)', 'rgba(255,255,255,.25)', 2);
+    if (Lv) { g.strokeStyle = 'rgba(220,220,220,.5)'; g.lineWidth = 5; for (const [a, d] of [['4', 'L'], ['6', 'R']]) { g.beginPath(); g.moveTo(MAPX + MAP[a][0] + 30, MAPY + MAP[a][1] + 14); g.lineTo(MAPX + MAP_DOORS[d][0] + 30, MAPY + MAP_DOORS[d][1] + 14); g.stroke(); } }
     g.strokeStyle = 'rgba(220,220,220,.5)'; g.lineWidth = 5;
     const L = (a, b) => { g.beginPath(); g.moveTo(MAPX + MAP[a][0] + 30, MAPY + MAP[a][1] + 14); g.lineTo(MAPX + MAP[b][0] + 30, MAPY + MAP[b][1] + 14); g.stroke(); };
     L(1, 2); L(2, 8); L(8, 3); L(2, 3); L(3, 4); L(2, 6); L(5, 6); L(2, 7);
     rrect(g, MAPX + 120, MAPY + 222, 80, 40, 3, 'rgba(255,255,255,.15)', '#ddd', 2); g.fillStyle = '#ddd'; g.font = 'bold 12px Arial'; g.fillText('TOI', MAPX + 148, MAPY + 247);
-    for (const [id, [x, y]] of Object.entries(MAP)) { const on = String(S.sel) === id; rrect(g, MAPX + x, MAPY + y, 60, 28, 3, on ? '#7ef0b4' : '#2a2e33', '#9aa', 2); g.fillStyle = on ? '#000' : '#ddd'; g.font = 'bold 13px Arial'; g.fillText('CAM ' + id, MAPX + x + 6, MAPY + y + 19); }
+    for (const [id, [x, y]] of Object.entries(Lv ? { ...MAP, ...MAP_DOORS } : MAP)) { const on = Lv ? Lv.pos === id || (Lv.mv && Lv.mv.to === id) : String(S.sel) === id; rrect(g, MAPX + x, MAPY + y, 60, 28, 3, on ? '#7ef0b4' : '#2a2e33', '#9aa', 2); g.fillStyle = on ? '#000' : '#ddd'; g.font = 'bold 13px Arial'; if (/[LR]/.test(id)) g.font = 'bold 11px Arial'; g.fillText(/[LR]/.test(id) ? 'PORTE ' + (id === 'L' ? 'G' : 'D') : 'CAM ' + id, MAPX + x + 6, MAPY + y + 19);
+      if (Lv && (Lv.eye === id || (Lv.next === id && T % .3 < .15))) { g.strokeStyle = Lv.eye === id ? '#ff3a2a' : '#ffd84a'; g.lineWidth = 3; g.strokeRect(MAPX + x - 5, MAPY + y - 5, 70, 38); } }
+    if (!Lv && S.mark && MAP[S.mark.cam]) { const [x, y] = MAP[S.mark.cam]; g.globalAlpha = Math.min(1, S.mark.t); g.fillStyle = '#ffd84a'; g.font = 'bold 13px Arial'; g.fillText(S.mark.k === '♪' ? '♪ carillon' : '≈ pas', MAPX + x, MAPY + y - 4); g.globalAlpha = 1; }
+  }
+  // Gérard, le père de Léo : un vieil homme en casquette de gardien, le visage blême, les yeux creux
+  function drawGerard(x, y, s, a) {
+    g.save(); g.globalAlpha = a;
+    soft(g, 10, () => blobPath(g, [x - 170 * s, y + 320 * s, x - 150 * s, y + 60 * s, x - 70 * s, y - 10 * s, x + 66 * s, y - 14 * s, x + 140 * s, y + 50 * s, x + 176 * s, y + 320 * s]), '#0d0e11');
+    form(g, [x - 44 * s, y - 120 * s, x + 46 * s, y - 124 * s, x + 54 * s, y - 70 * s, x + 30 * s, y - 26 * s, x + 6 * s, y - 18 * s, x - 26 * s, y - 28 * s, x - 48 * s, y - 72 * s], '#a8a290', { aw: 22 * s, ao: .6, hi: .12 });
+    for (const [ex, ey, rx] of [[-20, -88, 16], [22, -90, 15]]) soft(g, 5 * s, () => { g.beginPath(); g.ellipse(x + ex * s, y + ey * s, rx * s, 12 * s, 0, 0, Math.PI * 2); }, 'rgba(14,10,8,.92)');
+    soft(g, 6 * s, () => { g.beginPath(); g.ellipse(x - 30 * s, y - 56 * s, 9 * s, 18 * s, .2, 0, Math.PI * 2); g.ellipse(x + 36 * s, y - 58 * s, 8 * s, 18 * s, -.2, 0, Math.PI * 2); }, 'rgba(40,30,24,.35)');
+    for (const ex of [-20, 22]) ell(g, x + ex * s + Math.sin(T * 3) * s, y - 89 * s, 1.6 * s, 1.6 * s, 'rgba(255,240,220,.7)');
+    soft(g, 2 * s, () => { g.beginPath(); g.ellipse(x + 4 * s, y - 44 * s, 12 * s, 7 * s, .05, 0, Math.PI * 2); }, '#1a0f0c');
+    soft(g, 8 * s, () => { g.beginPath(); g.rect(x - 60 * s, y - 112 * s, 120 * s, 16 * s); }, 'rgba(0,0,0,.5)');
+    poly(g, [x - 56 * s, y - 128 * s, x + 60 * s, y - 132 * s, x + 64 * s, y - 112 * s, x - 58 * s, y - 108 * s], '#1c2836'); poly(g, [x - 60 * s, y - 112 * s, x + 78 * s, y - 114 * s, x + 74 * s, y - 104 * s, x - 62 * s, y - 104 * s], '#121a24');
+    rrect(g, x - 70 * s, y + 70 * s, 34 * s, 16 * s, 2, '#8a8270');
+    g.restore();
   }
 
   // ---------- l'interface par-dessus ----------
@@ -1024,22 +1078,34 @@ export default async function (ctx) {
     const bx = W / 2 - 300, by = H - 44; rrect(g, bx, by, 600, 32, 4, hoverBar ? 'rgba(255,255,255,.28)' : 'rgba(255,255,255,.14)', 'rgba(255,255,255,.4)', 2);
     g.fillStyle = '#fff'; g.font = 'bold 16px Arial'; g.textAlign = 'center'; g.fillText(S.cam ? '▼  BAISSER LA TABLETTE (ESPACE)' : '▲  CAMÉRAS (ESPACE)', W / 2, by + 22); g.textAlign = 'left';
     if (msg) { g.globalAlpha = Math.min(1, msg.t); g.fillStyle = msg.col; g.font = 'bold 24px Arial'; g.textAlign = 'center'; g.fillText(msg.text, W / 2, 120); g.textAlign = 'left'; g.globalAlpha = 1; }
+    if (S.tuto >= 0) { const [txt, , at] = TUTO[S.tuto], [ax, ay] = typeof at === 'function' ? at() : at, b = Math.sin(T * 6) * 8;
+      rrect(g, W / 2 - 420, 150, 840, 52, 8, 'rgba(10,30,22,.9)', '#7ef0b4', 2); g.fillStyle = '#7ef0b4'; g.font = 'bold 18px Arial'; g.textAlign = 'center'; g.fillText((S.tuto + 1) + '/' + TUTO.length + ' · ' + txt, W / 2, 183); g.textAlign = 'left';
+      g.fillStyle = '#ffd84a'; g.beginPath(); g.moveTo(ax + b, ay); g.lineTo(ax + 30 + b, ay - 18); g.lineTo(ax + 30 + b, ay + 18); g.closePath(); g.fill(); g.fillRect(ax + 30 + b, ay - 6, 36, 12); }
     if (S.said > 0) { S.said -= 1 / 60; g.fillStyle = `rgba(150,240,255,${Math.min(1, S.said)})`; g.font = 'italic 22px Georgia'; g.textAlign = 'center'; g.fillText('« ' + S.saidText + ' »', W / 2, H - 120); g.textAlign = 'left'; }
     // le message du téléphone : sous-titres et bouton pour le couper
     if (S.call) {
       const c = S.call, line = c.lines[c.i];
-      if (!c.spoken) { c.spoken = true; c.dur = Math.max(4, line.length * .062); A.say(line, { rate: 1.05, pitch: .9 }); }
+      if (!c.spoken && c.t >= 0) { c.spoken = true; c.dur = Math.max(4, line.length * .062); A.say(line, c.leo ? { rate: .74, pitch: .15, vol: .8, alt: true } : { rate: 1.05, pitch: .9 }); if (c.leo) A.glitch(); }
       if (c.t > c.dur) { c.i++; c.t = 0; c.spoken = false; if (c.i >= c.lines.length) S.call = null; }
-      if (S.call) { rrect(g, 160, H - 210, W - 320, 110, 8, 'rgba(0,0,0,.72)', 'rgba(255,255,255,.25)', 2); g.fillStyle = '#ffd84a'; g.font = 'bold 14px Arial'; g.fillText(S.n >= 5 ? '☎ NUMÉRO INCONNU' : '☎ MESSAGE DE GÉRARD, L\'ANCIEN VEILLEUR', 180, H - 186);
-        g.fillStyle = '#eee'; g.font = '18px Georgia'; wrapText(line, 180, H - 160, W - 360, 24);
+      if (S.call) { rrect(g, 160, H - 210, W - 320, 110, 8, 'rgba(0,0,0,.72)', 'rgba(255,255,255,.25)', 2); g.fillStyle = '#ffd84a'; g.font = 'bold 14px Arial'; g.fillText(c.leo ? (c.t < 0 ? '☎ ÇA SONNE…' : '☎ APPEL DU 13/11/1987, 23 H 59 — LÉO ?') : S.n >= 5 ? '☎ NUMÉRO INCONNU' : '☎ MESSAGE DE GÉRARD, L\'ANCIEN VEILLEUR', 180, H - 186);
+        g.fillStyle = c.leo ? '#b4f0ff' : '#eee'; g.font = '18px Georgia'; if (c.t >= 0) wrapText(c.leo && R(12) === 0 ? line.replace(/[aeiou]/g, '█') : line, 180, H - 160, W - 360, 24);
         rrect(g, W - 300, H - 202, 120, 26, 4, 'rgba(255,90,74,.25)', '#ff5a4a', 2); g.fillStyle = '#ff9a8a'; g.font = 'bold 12px Arial'; g.fillText('COUPER (C)', W - 280, H - 184); }
     }
   }
-  function wrapText(text, x, y, w, lh) { let line = '', yy = y; for (const word of text.split(' ')) { const t = line ? line + ' ' + word : word; if (g.measureText(t).width > w) { g.fillText(line, x, yy); line = word; yy += lh; } else line = t; } g.fillText(line, x, yy); }
+  const TUTO = [
+    ['Lève la tablette des caméras : ESPACE, ou passe la souris sur la barre du bas.', () => S.cam, [W / 2 + 310, H - 28]],
+    ['Choisis une autre caméra : clique sur la carte, ou touche 1 à 8.', () => S.cam && S.sel != 1, [MAPX + 210, MAPY + 100]],
+    ['Baisse la tablette (ESPACE).', () => !S.cam, [W / 2 + 310, H - 28]],
+    ['Regarde à gauche : souris au bord gauche de l\'écran, ou flèche ←.', () => S.pan < 120, [30, H / 2]],
+    ['Allume la lumière de la porte gauche (A) : s\'il est là, tu le verras.', () => S.lightL, () => [480 - S.pan + 30, 360]],
+    ['Ferme la porte gauche (Q).', () => S.doorL, () => [480 - S.pan + 30, 290]],
+    ['Rouvre-la (Q) : une porte fermée mange du courant. Bonne nuit !', () => !S.doorL, () => [480 - S.pan + 30, 290]],
+  ];
+  function wrapText(text, x, y, w, lh) { let line = '', yy = y; for (const word of text.split(' ')) { const t = line ? line + ' ' + word : word; if (g.measureText(t).width > w) { g.fillText(line, x, yy); line = word; yy += lh; } else line = t; } g.fillText(line, x, yy); return yy + lh; }
 
   // ---------- les écrans ----------
   const MENU = () => [['NOUVELLE PARTIE', () => { scene = 'intro'; sceneT = 0; }], ...(save.night > 1 ? [['CONTINUER · NUIT ' + Math.min(save.night, 5), () => start(Math.min(save.night, 5))]] : []),
-    ...(save.night >= 6 ? [['NUIT 6', () => start(6)]] : []), ...(save.stars >= 1 ? [['NUIT PERSO', () => { scene = 'custom'; sceneT = 0; }]] : []), ...(save.docs.length ? [['ARCHIVES (' + save.docs.length + ')', () => { scene = 'archives'; sceneT = 0; }]] : []), ['COMMENT JOUER', () => { scene = 'help'; sceneT = 0; }], [A.muted ? 'SON : NON' : 'SON : OUI', () => { A.muted = !A.muted; A.mute(A.muted); }]];
+    ...(save.night >= 6 ? [['NUIT 6', () => start(6)]] : []), ...(save.stars >= 1 ? [['NUIT PERSO', () => { scene = 'custom'; sceneT = 0; }]] : []), ...(save.docs.includes('fin') ? [['NUIT 7 · LÉO', startLeo]] : []), ...(save.docs.length ? [['ARCHIVES (' + save.docs.length + ')', () => { scene = 'archives'; sceneT = 0; }]] : []), ['COMMENT JOUER', () => { scene = 'help'; sceneT = 0; }], ['RÉGLAGES', () => { scene = 'settings'; sceneT = 0; }]];
   let buttons = [];
   const button = (label, x, y, w, h, fn, sel) => { const hov = mouse.x > x && mouse.x < x + w && mouse.y > y && mouse.y < y + h; buttons.push({ x, y, w, h, fn }); g.fillStyle = hov || sel ? '#fff' : '#9a9a9a'; g.font = 'bold 30px Impact, "Arial Black", sans-serif'; g.fillText((hov || sel ? '> ' : '') + label, x, y + h - 8); };
   function drawTitle() {
@@ -1051,8 +1117,9 @@ export default async function (ctx) {
     g.fillStyle = '#ececec'; g.font = '86px Impact, "Arial Black", sans-serif'; g.fillText('RAM', 80, 150); g.fillText('ALTMAN', 80, 236);
     g.fillStyle = '#7ef0b4'; g.font = 'bold 18px Consolas, monospace'; g.fillText('LE VEILLEUR DE LA PILE', 84, 272);
     for (let i = 0; i < save.stars; i++) { g.fillStyle = '#ffd84a'; g.font = '34px Arial'; g.fillText('★', 84 + i * 40, 320); }
-    MENU().forEach(([l, fn], i) => button(l, 84, 344 + i * 50, 460, 44, fn, i === menuSel));
-    g.fillStyle = '#666'; g.font = '13px Arial'; g.fillText('Une parodie. Aucun vrai patron n\'a été robotisé.', 84, H - 30);
+    if (save.medals.length) { g.fillStyle = '#ffd84a'; g.font = 'bold 12px Arial'; g.fillText('MÉDAILLES : ' + save.medals.map(i => CHALL[i]).join(' · '), 84 + save.stars * 40 + 12, 312); }
+    MENU().forEach(([l, fn], i) => button(l, 84, 330 + i * 43, 460, 40, fn, i === menuSel));
+    g.fillStyle = '#666'; g.font = '13px Arial'; g.fillText('Une parodie. Aucun vrai patron n\'a été robotisé.', W - 340, H - 16);
   }
   function drawIntro() {
     g.fillStyle = '#05080a'; g.fillRect(0, 0, W, H);
@@ -1065,10 +1132,10 @@ export default async function (ctx) {
   }
   function drawHelp() {
     g.fillStyle = '#05080a'; g.fillRect(0, 0, W, H); g.fillStyle = '#ececec'; g.font = '48px Impact, "Arial Black", sans-serif'; g.fillText('COMMENT JOUER', 80, 100);
-    g.font = '20px Georgia'; g.fillStyle = '#ccc';
+    g.font = '18px Georgia'; g.fillStyle = '#ccc'; let hy = 150;
     ['Tiens de 00 h à 06 h sans perdre la Pile (64 Go de RAM).', '', 'Souris aux bords de l\'écran (ou ← →) : regarder à gauche et à droite.', 'Q / D : porte gauche / droite.   A / E : lumière gauche / droite.', 'V : trappe d\'aération.   ESPACE : les caméras (1 à 8 pour en choisir une).   C : couper le message.', '',
       'RAM ALTMAN : il marche vers tes portes. Dans le noir on ne le voit pas : éclaire. S\'il entre, plus rien ne marche… ne baisse pas la tablette.', 'LE REVENDEUR : regarde-le à la caméra 5, sinon il court par le couloir est (−16 Go si la porte droite est ouverte).', 'LES PUCES : elles grattent dans la gaine (caméra 7). Ferme la trappe quand elles arrivent (−8 Go sinon).', '',
-      'LEURRE AUDIO (L) : un carillon dans la pièce filmée ; s\'il est à côté, il vient voir. Utile pour l\'éloigner d\'une porte.', 'CAMÉRAS PIRATÉES : redémarre-les au moniteur du bureau (R). Des papiers traînent parfois sur les caméras : clique dessus.', 'Tout consomme du courant. À 0 %, tout s\'éteint… et il fredonne.', '[ cliquer pour revenir ]'].forEach((l, i) => g.fillText(l, 80, 170 + i * 34));
+      'LEURRE AUDIO (L) : un carillon dans la pièce filmée ; s\'il est à côté, il vient voir. Utile pour l\'éloigner d\'une porte.', 'PANNES : le moniteur du bureau dit quoi réparer, une chose à la fois. R : caméras, T : trappe, P : courant. Des papiers traînent sur les caméras : clique.', 'GÉRARD (nuit 4) : reste trop longtemps dans les caméras et il entre. Baisse la tablette. Et n\'écoute pas tout : il imite le carillon.', 'Tout consomme du courant. À 0 %, tout s\'éteint… et il fredonne.', '[ cliquer pour revenir ]'].forEach(l => { hy = l ? wrapText(l, 80, hy, W - 160, 25) + 3 : hy + 10; });
   }
   function drawCustom() {
     g.fillStyle = '#05080a'; g.fillRect(0, 0, W, H); g.fillStyle = '#ececec'; g.font = '48px Impact, "Arial Black", sans-serif'; g.fillText('NUIT PERSO', 80, 100);
@@ -1081,8 +1148,71 @@ export default async function (ctx) {
       button('−', x + 70, y + 250, 50, 46, () => { save.custom[i] = Math.max(0, save.custom[i] - 1); }); button('+', x + 240, y + 250, 50, 46, () => { save.custom[i] = Math.min(20, save.custom[i] + 1); });
     });
     button('LANCER LA NUIT', 80, 540, 360, 50, () => { keep(); start(7, save.custom); });
-    button('RETOUR', 80, 610, 200, 50, () => { scene = 'title'; });
-    g.fillStyle = '#888'; g.font = '16px Arial'; g.fillText('20 / 20 / 20 jusqu\'à 6 h : la troisième étoile.', 520, 580);
+    button('RETOUR', 80, 610, 200, 50, () => { keep(); scene = 'title'; });
+    CHALL.forEach((c, i) => button((save.chall[i] ? '[X] ' : '[  ] ') + c + (save.medals.includes(i) ? ' ★' : ''), 520, 520 + i * 52, 520, 44, () => { save.chall[i] = !save.chall[i]; }));
+    g.fillStyle = '#888'; g.font = '15px Arial'; g.fillText('20 / 20 / 20 jusqu\'à 6 h : la troisième étoile. Un défi gagné avec chaque menace à 10 ou plus : une médaille.', 80, 700);
+  }
+  function drawSettings() {
+    g.fillStyle = '#05080a'; g.fillRect(0, 0, W, H); g.fillStyle = '#ececec'; g.font = '48px Impact, "Arial Black", sans-serif'; g.fillText('RÉGLAGES', 80, 100);
+    const o = save.opts, cl = (v, a, b) => Math.round(Math.min(b, Math.max(a, v)) * 100) / 100;
+    [['Son', A.muted ? 'COUPÉ' : 'ALLUMÉ', () => { A.muted = !A.muted; A.mute(A.muted); }],
+      ['Volume des bruits', Math.round(o.sfx * 100) + ' %', d => { o.sfx = cl(o.sfx + d * .1, 0, 1); A.setVol(o.sfx); }],
+      ['Volume des voix', Math.round(o.voice * 100) + ' %', d => { o.voice = cl(o.voice + d * .1, 0, 1); A.voice = o.voice; }],
+      ['Vitesse du regard (souris aux bords)', o.pan + ' ×', d => { o.pan = cl(o.pan + d * .25, .5, 2); }],
+      ['Sauts au visage', o.calm ? 'ATTÉNUÉS' : 'NORMAUX', () => { o.calm = !o.calm; }],
+      ['Tutoriel de la nuit 1', save.tuto ? 'DÉJÀ FAIT' : 'À LA PROCHAINE NUIT 1', () => { save.tuto = save.tuto ? 0 : 1; }]].forEach(([l, v, fn], i) => {
+      const y = 140 + i * 72; g.fillStyle = '#ccc'; g.font = '22px Georgia'; g.fillText(l, 80, y + 32); g.fillStyle = '#7ef0b4'; g.font = 'bold 22px Consolas, monospace'; g.fillText(v, 560, y + 32);
+      if (fn.length) { button('−', 860, y, 50, 44, () => fn(-1)); button('+', 930, y, 50, 44, () => fn(1)); } else button('CHANGER', 860, y, 200, 44, fn); });
+    g.fillStyle = '#888'; g.font = '15px Arial'; g.fillText('« Atténués » : pas de cri ni de visage qui surgit, pas d\'hallucinations. Le jeu reste le même.', 80, 600);
+    button('RETOUR', 80, H - 80, 200, 50, () => { keep(); scene = 'title'; });
+  }
+  // ---------- la nuit 7, cachée : on est Léo, dans le corps du robot, et le veilleur nous cherche aux caméras ----------
+  let L7 = null;
+  function startLeo() { A.unlock(); A.hush(); A.ambience(true); L7 = { pos: '1', mv: null, eye: '5', eyeT: 3, next: null, sus: 0, door: { L: true, R: true }, doorT: 3, end: 0, won: false, t: 0 }; scene = 'leo'; sceneT = 0; }
+  function leoTick(dt) {
+    const s = L7; s.t += dt; if (s.end) { s.end += dt; return; }
+    // le veilleur change de caméra ; la suivante clignote 0,8 s avant
+    s.eyeT -= dt;
+    if (s.eyeT < .8 && !s.next) { const near = [s.pos, ...(ADJ[s.pos] || [])], pool = R(10) < 6 ? near : LEO_ROOMS; s.next = pool[R(pool.length)]; if (s.next === s.eye) s.next = LEO_ROOMS[R(LEO_ROOMS.length)]; }
+    if (s.eyeT <= 0) { s.eye = s.next; s.next = null; s.eyeT = Math.max(1.6, 3.8 - s.t / 60) + Math.random() * 1.5; A.camSwitch(); }
+    // il ferme et rouvre ses portes pour garder du courant
+    if ((s.doorT -= dt) <= 0) { s.doorT = 2.5 + Math.random() * 3.5; const d = R(2) ? 'L' : 'R'; s.door[d] = !s.door[d]; A.door(s.door[d]); }
+    // marcher prend 1,4 s : pendant ce temps, on est visible dans les deux pièces
+    if (s.mv && (s.mv.t -= dt) <= 0) { s.pos = s.mv.to; s.mv = null; }
+    const seen = s.eye === s.pos || (s.mv && s.eye === s.mv.to);
+    s.sus = Math.max(0, s.sus + (seen ? (s.mv ? 1.1 : .28) : -.08) * dt);
+    if (s.sus >= 1) { s.end = .01; A.bang(0); A.glitch(); }
+  }
+  function leoMove(to) {
+    const s = L7; if (s.end || s.mv) return A.deny();
+    if (to === 'in') { if (/[LR]/.test(s.pos) && !s.door[s.pos]) { s.end = .01; s.won = true; A.ambience(false); A.chime(); if (!save.docs.includes('epi')) { save.docs.push('epi'); keep(); } } else A.deny(); return; }
+    if (!(ADJ[s.pos] || []).includes(to)) return A.deny();
+    s.mv = { to, t: 1.4 }; stepAt(to);
+  }
+  function drawLeo() {
+    const s = L7, seen = s.eye === s.pos || (s.mv && s.eye === s.mv.to);
+    g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+    if (s.mv) { g.drawImage(NOISE[(T * 30 | 0) % 4], 0, 0, W, H); g.fillStyle = 'rgba(0,0,0,.82)'; g.fillRect(0, 0, W, H); g.fillStyle = '#9aa'; g.font = 'italic 24px Georgia'; g.textAlign = 'center'; g.fillText('tu marches…', (MAPX - 20) / 2, H / 2); g.textAlign = 'left'; }
+    else if (/[LR]/.test(s.pos)) {
+      const closed = s.door[s.pos]; g.fillStyle = '#0a0907'; g.fillRect(0, 0, W, H);
+      if (closed) { g.fillStyle = lin(g, 220, 0, 700, 0, [[0, '#3a3e44'], [.5, '#70757c'], [1, '#33373c']]); g.fillRect(220, 150, 480, 410); g.fillStyle = 'rgba(0,0,0,.35)'; for (let y = 168; y < 560; y += 22) g.fillRect(220, y, 480, 3); }
+      else { g.drawImage(office.c, 860, 150, 560, 470, 220, 150, 480, 410); g.fillStyle = 'rgba(0,0,0,.4)'; g.fillRect(220, 150, 480, 410); const px = 340; rrect(g, px, 440, 240, 80, 6, 'rgba(20,30,28,.9)', '#7a8a86', 3); for (let i = 0; i < 8; i++) rrect(g, px + 12 + i * 28, 454, 18, 54, 2, '#1f8a52'); glow(g, px + 120, 480, 170, '60,255,150', .25 + .08 * Math.sin(T * 2)); }
+      g.strokeStyle = '#2a2620'; g.lineWidth = 14; g.strokeRect(213, 143, 494, 424);
+      g.fillStyle = closed ? '#ff8a7a' : '#7ef0b4'; g.font = 'bold 22px Consolas, monospace'; g.textAlign = 'center'; g.fillText(closed ? 'PORTE FERMÉE · attends qu\'il la rouvre' : 'PORTE OUVERTE · la Pile est là', 460, 610); g.textAlign = 'left';
+      if (!closed) button('ENTRER (ENTRÉE)', 330, 624, 300, 44, () => leoMove('in'));
+    } else { const room = rooms[s.pos]; g.drawImage(room.base, 0, 0); g.drawImage(room.shade, 0, 0); g.fillStyle = 'rgba(0,0,10,.3)'; g.fillRect(0, 0, W, H); }
+    // ses mains de métal en bas de l'image : c'est toi
+    if (!s.mv && !/[LR]/.test(s.pos)) for (const hx of [380, 560]) { soft(g, 4, () => blobPath(g, [hx - 50, H + 10, hx - 40, H - 70, hx, H - 96, hx + 40, H - 70, hx + 50, H + 10]), '#4a4e54'); wline(g, [hx - 20, H - 80, hx - 18, H - 40], '#2a2d31', 3); wline(g, [hx + 10, H - 84, hx + 12, H - 40], '#2a2d31', 3); }
+    g.drawImage(SCAN, 0, 0); post(g, T, .09, .75);
+    if (seen && !s.end) { g.strokeStyle = 'rgba(255,40,30,' + (.6 + .3 * Math.sin(T * 10)) + ')'; g.lineWidth = 14; g.strokeRect(7, 7, W - 14, H - 14); g.fillStyle = '#ff5a4a'; g.font = 'bold 24px Consolas, monospace'; g.fillText('● IL TE REGARDE — NE BOUGE PAS', 30, 60); }
+    g.fillStyle = '#ccc'; g.font = 'bold 18px Consolas, monospace'; g.fillText('NUIT 7 · TU ES LÉO', 30, 100); g.font = '15px Consolas, monospace'; g.fillStyle = '#9aa'; g.fillText('Rejoins une porte, attends qu\'elle s\'ouvre, entre. Clique une pièce voisine sur la carte.', 30, 126);
+    drawMap(s);
+    g.fillStyle = '#ccc'; g.font = 'bold 16px Consolas, monospace'; g.fillText('SOUPÇON', MAPX - 10, MAPY - 30); rrect(g, MAPX + 80, MAPY - 46, 240, 20, 4, 'rgba(255,255,255,.08)', '#666', 2); g.fillStyle = s.sus > .7 ? '#ff4a3a' : '#ffd84a'; g.fillRect(MAPX + 82, MAPY - 44, 236 * Math.min(1, s.sus), 16);
+    if (s.end > .6) { g.fillStyle = 'rgba(0,0,0,.88)'; g.fillRect(0, 0, W, H); g.textAlign = 'center';
+      if (s.won) { g.fillStyle = '#7ef0b4'; g.font = '52px Impact, "Arial Black", sans-serif'; g.fillText('LÉO', W / 2, 150); g.fillStyle = '#ddd'; g.font = '20px Georgia'; let y = 210; for (const l of EPI[1].split('\n')) { g.fillText(l, W / 2, y); y += l ? 30 : 12; } button('FIN', W / 2 - 50, y + 20, 120, 50, () => { scene = 'title'; }); }
+      else { g.fillStyle = '#ff5a4a'; g.font = '52px Impact, "Arial Black", sans-serif'; g.fillText('IL T\'A VU', W / 2, H / 2 - 40); g.fillStyle = '#ccc'; g.font = '22px Georgia'; g.fillText('Il ferme les portes. Tu oublies encore un peu.', W / 2, H / 2 + 6);
+        button('RÉESSAYER', W / 2 - 220, H / 2 + 60, 220, 50, startLeo); button('MENU', W / 2 + 60, H / 2 + 60, 160, 50, () => { A.ambience(false); scene = 'title'; }); }
+      g.textAlign = 'left'; }
   }
   function drawCard() {
     g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
@@ -1100,16 +1230,16 @@ export default async function (ctx) {
     g.textAlign = 'left'; post(g, T, .1, .6);
   }
   // ---------- les archives : ce que tu as appris ----------
-  const DOCS = () => [...FRAGS.map(([id, t, x]) => ({ id, t, x, k: 'FRAGMENT' })), ...Object.entries(NEWS).map(([n, [t, x]]) => ({ id: 'j' + n, t, x, k: 'JOURNAL' })), { id: 'fin', t: TRUE_END[0], x: TRUE_END[1], k: '???' }];
+  const DOCS = () => [...FRAGS.map(([id, t, x]) => ({ id, t, x, k: TAPES.includes(id) ? 'CASSETTE' : 'FRAGMENT' })), ...Object.entries(NEWS).map(([n, [t, x]]) => ({ id: 'j' + n, t, x, k: 'JOURNAL' })), { id: 'fin', t: TRUE_END[0], x: TRUE_END[1], k: '???' }, { id: 'epi', t: EPI[0], x: EPI[1], k: '???' }];
   let doc = null;
   function drawArchives() {
     g.fillStyle = '#07090a'; g.fillRect(0, 0, W, H); g.fillStyle = '#ececec'; g.font = '48px Impact, "Arial Black", sans-serif'; g.fillText('ARCHIVES', 80, 90);
     const all = DOCS(), have = all.filter(d => save.docs.includes(d.id)).length; g.font = '16px Consolas, monospace'; g.fillStyle = '#7ef0b4'; g.fillText(have + ' / ' + all.length + ' documents', 330, 88);
-    all.forEach((d, i) => { const x = 80 + (i % 3) * 380, y = 130 + Math.floor(i / 3) * 92, got = save.docs.includes(d.id);
-      rrect(g, x, y, 350, 78, 6, got ? '#111a16' : '#0c0d0e', got ? '#3a6a52' : '#25282b', 2);
+    all.forEach((d, i) => { const x = 80 + (i % 3) * 380, y = 124 + Math.floor(i / 3) * 80, got = save.docs.includes(d.id);
+      rrect(g, x, y, 350, 70, 6, got ? '#111a16' : '#0c0d0e', got ? '#3a6a52' : '#25282b', 2);
       g.fillStyle = got ? '#ffd84a' : '#444'; g.font = 'bold 11px Arial'; g.fillText(d.k, x + 14, y + 22);
       g.fillStyle = got ? '#e8e8e8' : '#555'; g.font = '17px Georgia'; g.fillText(got ? d.t : '— pas encore trouvé —', x + 14, y + 48);
-      if (got) buttons.push({ x, y, w: 350, h: 78, fn: () => { doc = d; scene = 'doc'; sceneT = 0; } }); });
+      if (got) buttons.push({ x, y, w: 350, h: 70, fn: () => { doc = d; scene = 'doc'; sceneT = 0; } }); });
     button('RETOUR', 80, H - 70, 200, 50, () => { scene = 'title'; });
   }
   function drawDoc() {
@@ -1117,7 +1247,10 @@ export default async function (ctx) {
     g.save(); g.translate(W / 2, H / 2); g.rotate(-.012); form(g, [-430, -300, 430, -306, 436, 300, -432, 296], doc.k === 'JOURNAL' ? '#d8d0b8' : '#cfc8b4', { path: (gg, p) => wobPath(gg, p), aw: 30, ao: .45, hi: .1 }); g.restore();
     g.fillStyle = '#5a2a20'; g.font = 'bold 13px Arial'; g.fillText(doc.k, W / 2 - 390, 112);
     g.fillStyle = '#1a1a1a'; g.font = 'bold 26px Georgia'; g.fillText(doc.t, W / 2 - 390, 150);
-    g.font = '19px Georgia'; let y = 196; for (const para of doc.x.split('\n')) { if (!para) { y += 14; continue; } const words = para.split(' '); let line = ''; for (const w of words) { const t = line ? line + ' ' + w : w; if (g.measureText(t).width > 780) { g.fillText(line, W / 2 - 390, y); y += 28; line = w; } else line = t; } g.fillText(line, W / 2 - 390, y); y += 28; }
+    g.font = '19px Georgia'; let y = 196; for (const para of doc.x.split('\n')) { if (!para) { y += 14; continue; } const words = para.split(' '); let line = ''; for (const w of words) { const t = line ? line + ' ' + w : w; if (g.measureText(t).width > (doc.k === 'CASSETTE' ? 520 : 780)) { g.fillText(line, W / 2 - 390, y); y += 28; line = w; } else line = t; } g.fillText(line, W / 2 - 390, y); y += 28; }
+    if (doc.k === 'CASSETTE') { rrect(g, W / 2 + 150, 92, 200, 120, 8, '#1a1a1c', '#555', 3); for (const cx of [W / 2 + 205, W / 2 + 295]) { ell(g, cx, 140, 22, 22, '#d8d0b8'); g.save(); g.translate(cx, 140); g.rotate(speechSynthesis.speaking ? T * 4 : 0); g.fillStyle = '#1a1a1c'; for (let k = 0; k < 6; k++) { g.rotate(Math.PI / 3); g.fillRect(-2, 8, 4, 10); } g.restore(); } rrect(g, W / 2 + 170, 176, 160, 24, 3, '#c8a050');
+      rrect(g, W / 2 + 150, 222, 200, 40, 6, '#2a2420', '#5a4a3a', 2); g.fillStyle = '#f0e6d0'; g.font = 'bold 18px Arial'; g.textAlign = 'center'; g.fillText(speechSynthesis.speaking ? '■ ARRÊTER' : '▶ ÉCOUTER', W / 2 + 250, 248); g.textAlign = 'left';
+      buttons.push({ x: W / 2 + 150, y: 222, w: 200, h: 40, fn: () => { if (speechSynthesis.speaking) return A.hush(); A.hush(); doc.x.split('\n').filter(Boolean).forEach(l => A.say(l.replace(/[«»]/g, ''), { rate: .85, pitch: doc.id === 'f6' ? .7 : .45, alt: doc.id !== 'f6' })); } }); }
     post(g, T, .08, .7);
     g.fillStyle = '#888'; g.font = '14px Arial'; g.textAlign = 'center'; g.fillText('[ cliquer pour revenir ]', W / 2, H - 30); g.textAlign = 'left';
   }
@@ -1127,10 +1260,10 @@ export default async function (ctx) {
       // le saut au visage : il fonce sur toi, l'image tremble, rougit, se déchire
       g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
       const s = 2.2 + t * 1.6 + Math.sin(t * 50) * .05, sx = Math.sin(t * 70) * 18, sy = Math.cos(t * 55) * 14;
-      if (S.why === 'empty' || S.why === 'ram') { prepJaws(); const lunge = Math.min(1, t / .22), J = JAWS[Math.min(3, Math.max(0, (t - .22) / .12 | 0))], k = (s * (.35 + .65 * lunge)) / 3.4, jx = (1 - lunge) * (S.side === 'R' ? 420 : -420) + (R(9) === 0 ? R(60) - 30 : 0);
+      if (!save.opts.calm && (S.why === 'empty' || S.why === 'ram')) { prepJaws(); const lunge = Math.min(1, t / .22), J = JAWS[Math.min(3, Math.max(0, (t - .22) / .12 | 0))], k = (s * (.35 + .65 * lunge)) / 3.4, jx = (1 - lunge) * (S.side === 'R' ? 420 : -420) + (R(9) === 0 ? R(60) - 30 : 0);
         g.save(); g.translate(W / 2 + sx + jx, H / 2 + 40 + sy); g.rotate(Math.sin(t * 37) * .06 + (1 - lunge) * (S.side === 'R' ? .4 : -.4)); g.drawImage(J, -450 * k, -500 * k, 900 * k, 1100 * k); for (const ex of [-30, 28]) { glow(g, ex * 3.4 * k, -22 * 3.4 * k, 120 * k, '110,240,255', .9); glow(g, ex * 3.4 * k, -22 * 3.4 * k, 20 * k, '240,255,255', 1); } g.restore(); }
-      g.fillStyle = `rgba(255,20,10,${.15 + .15 * Math.sin(t * 40)})`; g.fillRect(0, 0, W, H);
-      for (let i = 0; i < 6; i++) { const y = R(H); g.drawImage(cv, 0, y, W, 20, R(60) - 30, y, W, 20); }
+      g.fillStyle = save.opts.calm ? 'rgba(60,0,0,.5)' : `rgba(255,20,10,${.15 + .15 * Math.sin(t * 40)})`; g.fillRect(0, 0, W, H);
+      if (!save.opts.calm) for (let i = 0; i < 6; i++) { const y = R(H); g.drawImage(cv, 0, y, W, 20, R(60) - 30, y, W, 20); }
       post(g, T, .25, .7);
     } else {
       // la statique, puis l'écran de fin
@@ -1149,7 +1282,7 @@ export default async function (ctx) {
     const dt = Math.max(0, Math.min(.1, (now - last) / 1000)) * speed; last = now;  // la première image de requestAnimationFrame peut dater d'avant « last »
     buttons = []; sceneT += dt;
     if (!view.isConnected) return;
-    if (scene === 'play') { tick(dt); if (scene === 'play') { S.pan = Math.max(0, Math.min(OW - W, S.pan + panDir() * 900 * dt)); if (S.ca > .5) drawCam(); else drawOffice(); if (S.ca > .02 && S.ca < .98) { g.fillStyle = `rgba(0,0,0,${1 - Math.abs(S.ca - .5) * 2})`; g.fillRect(0, 0, W, H); } post(g, T, S.ca > .5 ? .05 : .09, S.ca > .5 ? .5 : .75); if (S.hall > 0 && JAWS) { const J = JAWS[R(4)], k = 1.1 + Math.random() * .3; g.save(); g.globalAlpha = .85; g.drawImage(J, W / 2 - 450 * k / 1.6 + R(40) - 20, H / 2 - 520 * k / 1.6, 900 * k / 1.6, 1100 * k / 1.6); g.restore(); g.fillStyle = 'rgba(120,0,0,.3)'; g.fillRect(0, 0, W, H); for (let i = 0; i < 5; i++) { const y = R(H); g.drawImage(cv, 0, y, W, 24, R(80) - 40, y, W, 24); } } drawHud(); } }
+    if (scene === 'play') { tick(dt); if (scene === 'play') { S.pan = Math.max(0, Math.min(OW - W, S.pan + panDir() * 900 * save.opts.pan * dt)); if (S.ca > .5) drawCam(); else drawOffice(); if (S.ca > .02 && S.ca < .98) { g.fillStyle = `rgba(0,0,0,${1 - Math.abs(S.ca - .5) * 2})`; g.fillRect(0, 0, W, H); } post(g, T, S.ca > .5 ? .05 : .09, S.ca > .5 ? .5 : .75); if (S.hall > 0 && JAWS) { const J = JAWS[R(4)], k = 1.1 + Math.random() * .3; g.save(); g.globalAlpha = .85; g.drawImage(J, W / 2 - 450 * k / 1.6 + R(40) - 20, H / 2 - 520 * k / 1.6, 900 * k / 1.6, 1100 * k / 1.6); g.restore(); g.fillStyle = 'rgba(120,0,0,.3)'; g.fillRect(0, 0, W, H); for (let i = 0; i < 5; i++) { const y = R(H); g.drawImage(cv, 0, y, W, 24, R(80) - 40, y, W, 24); } } drawHud(); } }
     if (scene === 'title') { T += dt; drawTitle(); post(g, T, .12, .7); }
     else if (scene === 'intro') { T += dt; drawIntro(); }
     else if (scene === 'help') { T += dt; drawHelp(); }
@@ -1158,6 +1291,8 @@ export default async function (ctx) {
     else if (scene === 'six') { T += dt; drawSix(); }
     else if (scene === 'archives') { T += dt; drawArchives(); }
     else if (scene === 'doc') { T += dt; drawDoc(); }
+    else if (scene === 'settings') { T += dt; drawSettings(); }
+    else if (scene === 'leo') { T += dt; leoTick(dt); drawLeo(); }
     else if (scene === 'jump') { T += dt; drawJump(); }
     requestAnimationFrame(frame);
   }
@@ -1167,12 +1302,13 @@ export default async function (ctx) {
 
   // ---------- les commandes ----------
   const toCanvas = e => { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height }; };
-  const reboot = () => { if (!S.hacked || S.reboot > 0 || S.out || S.ramPos === 'in') return A.deny(); S.reboot = 4; A.reboot(); };
-  const toggleCam = () => { if (S.out) return A.deny(); S.cam = !S.cam; if (S.cam) { S.lightL = S.lightR = false; A.camUp(); } else { A.camSwitch(); if (S.ramPos === 'in') die('ram'); } };
+  const repair = w => { if (!faults().includes(w) || S.fix || S.out || S.ramPos === 'in') return A.deny(); S.fix = { w, t: 4 }; A.reboot(); };
+  const reboot = () => repair('cams');
+  const toggleCam = () => { if (S.out) return A.deny(); S.cam = !S.cam; if (S.cam) { S.lightL = S.lightR = false; A.camUp(); } else { A.camSwitch(); if (S.ramPos === 'in') return die('ram'); if (S.ger) { S.ger = null; S.camHold = 0; S.gerSeen = 1.4; A.glitch(); flash('Gérard repart dans le noir…', '#9ad8b4'); } } };
   const act = {
     doorL: () => { if (S.out || S.ramPos === 'in') return A.deny(); S.doorL = !S.doorL; A.door(S.doorL); }, doorR: () => { if (S.out || S.ramPos === 'in') return A.deny(); S.doorR = !S.doorR; A.door(S.doorR); },
     lightL: () => { if (S.out || S.cam || S.ramPos === 'in') return A.deny(); S.lightL = !S.lightL; S.lightR = false; A.light(S.lightL); }, lightR: () => { if (S.out || S.cam || S.ramPos === 'in') return A.deny(); S.lightR = !S.lightR; S.lightL = false; A.light(S.lightR); },
-    vent: () => { if (S.out || S.ramPos === 'in') return A.deny(); S.vent = !S.vent; A.vent(S.vent); },
+    vent: () => { if (S.out || S.ramPos === 'in' || S.fault.vent) return A.deny(); S.vent = !S.vent; A.vent(S.vent); },
   };
   cv.addEventListener('pointermove', e => {
     Object.assign(mouse, toCanvas(e), { inside: true });
@@ -1187,12 +1323,13 @@ export default async function (ctx) {
     for (const b of buttons) if (x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h) { A.click(); return b.fn(); }
     if (scene === 'intro') return sceneT > 2 ? start(1) : (sceneT = 99);
     if (scene === 'help') { scene = 'title'; return; }
-    if (scene === 'doc') { scene = 'archives'; return; }
+    if (scene === 'doc') { A.hush(); scene = 'archives'; return; }
     if (scene === 'six' && sceneT > 3) { if (S.n === 7) scene = 'title'; else start(Math.min(S.n + 1, 6)); return; }
+    if (scene === 'leo') { if (L7.end) return; for (const [id, [mx, my]] of Object.entries({ ...MAP, ...MAP_DOORS })) if (x > MAPX + mx && x < MAPX + mx + 60 && y > MAPY + my && y < MAPY + my + 28) return leoMove(id); return; }
     if (scene !== 'play') return;
     if (S.call && x > W - 300 && x < W - 180 && y > H - 202 && y < H - 176) { S.call = null; A.hush(); return; }
     if (S.cam) { if (x > MAPX - 10 && x < MAPX + 320 && y > MAPY - 58 && y < MAPY - 18) return lure(); if (pickFrag(x, y)) return; for (const [id, [mx, my]] of Object.entries(MAP)) if (x > MAPX + mx && x < MAPX + mx + 60 && y > MAPY + my && y < MAPY + my + 28) { S.sel = id; S.switchT = .22; A.camSwitch(); } return; }
-    if (x + S.pan > 560 && x + S.pan < 800 && y > 410 && y < 570) return reboot();
+    if (x + S.pan > 560 && x + S.pan < 800 && y > 410 && y < 570) { const fl = faults(), i = Math.floor((y - 484) / 22); return fl[i] ? repair(fl[i]) : fl.length ? repair(fl[0]) : A.deny(); }
     const ox = x + S.pan;
     for (const side of ['L', 'R']) { const [px, y1, y2] = PANELS[side]; if (Math.hypot(ox - px, y - y1) < 26) return act['door' + side](); if (Math.hypot(ox - px, y - y2) < 26) return act['light' + side](); }
     if (ox > 880 && ox < 990 && y > 600 && y < 656) return act.vent();
@@ -1200,11 +1337,12 @@ export default async function (ctx) {
   document.addEventListener('keydown', e => {
     if (!view.isConnected) return; keysDown.add(e.key); const k = e.key.toLowerCase();
     if (scene === 'title') { const m = MENU(); if (k === 'arrowdown') menuSel = (menuSel + 1) % m.length; if (k === 'arrowup') menuSel = (menuSel + m.length - 1) % m.length; if (k === 'enter') { A.unlock(); m[menuSel][1](); } return; }
-    if (scene !== 'play') { if (k === 'enter' || k === ' ') cv.dispatchEvent(new PointerEvent('pointerdown', { clientX: -9999, clientY: -9999 })); if (k === 'escape') scene = 'title'; return; }
+    if (scene === 'leo' && !L7.end) { if (/^[1-8]$/.test(k)) leoMove(k); else if (k === 'g') leoMove('L'); else if (k === 'h') leoMove('R'); else if (k === 'enter') leoMove('in'); else if (k === 'escape') { A.ambience(false); scene = 'title'; } return; }
+    if (scene !== 'play') { if (k === 'enter' || k === ' ') cv.dispatchEvent(new PointerEvent('pointerdown', { clientX: -9999, clientY: -9999 })); if (k === 'escape') { A.hush(); A.ambience(false); keep(); scene = 'title'; } return; }
     if (k === ' ') { e.preventDefault(); toggleCam(); }
     else if (k === 'q') act.doorL(); else if (k === 'd') act.doorR(); else if (k === 'a') act.lightL(); else if (k === 'e') act.lightR(); else if (k === 'v') act.vent();
     else if (k === 'c' && S.call) { S.call = null; A.hush(); }
-    else if (k === 'l') lure(); else if (k === 'r') reboot();
+    else if (k === 'l') lure(); else if (k === 'r') reboot(); else if (k === 't') repair('vent'); else if (k === 'p') repair('leak');
     else if (/^[1-8]$/.test(k) && S.cam) { S.sel = k; S.switchT = .22; A.camSwitch(); }
     else if (k === 'escape') { A.hush(); A.ambience(false); scene = 'title'; }
   });
@@ -1212,13 +1350,15 @@ export default async function (ctx) {
   cv.focus();
 
   // l'état lisible par un lecteur d'écran, mis à jour deux fois par seconde
-  setInterval(() => { if (scene === 'play') cv.setAttribute('aria-label', `Nuit ${S.n}, ${HOUR[Math.min(6, Math.floor(S.time / S.hourLen))]}, courant ${Math.max(0, S.power | 0)} %, RAM ${S.ram} Go${S.doorL ? ', porte gauche fermée' : ''}${S.doorR ? ', porte droite fermée' : ''}${S.vent ? ', trappe fermée' : ''}${S.cam ? ', caméra ' + S.sel : ''}.`); else cv.setAttribute('aria-label', 'Ram Altman : ' + scene); }, 500);
+  setInterval(() => { if (scene === 'play') cv.setAttribute('aria-label', `Nuit ${S.n}, ${HOUR[Math.min(6, Math.floor(S.time / S.hourLen))]}, courant ${Math.max(0, S.power | 0)} %, RAM ${S.ram} Go${S.doorL ? ', porte gauche fermée' : ''}${S.doorR ? ', porte droite fermée' : ''}${S.vent ? ', trappe fermée' : ''}${S.cam ? ', caméra ' + S.sel : ''}.`); else if (scene === 'leo') cv.setAttribute('aria-label', `Nuit 7, tu es Léo, ${/[LR]/.test(L7.pos) ? 'porte ' + (L7.pos === 'L' ? 'gauche ' : 'droite ') + (L7.door[L7.pos] ? 'fermée' : 'ouverte') : 'caméra ' + L7.pos}, le veilleur regarde ${/[LR]/.test(L7.eye) ? 'une porte' : 'la caméra ' + L7.eye}, soupçon ${Math.round(L7.sus * 100)} %.`); else cv.setAttribute('aria-label', 'Ram Altman : ' + scene); }, 500);
   // vérification interne : chaque chemin de Ram mène à une porte, chaque nuit a ses réglages
   const bad = [];
   for (const from of Object.keys(RAM_NEXT)) { const seen = new Set(), q = [from]; while (q.length) { const p = q.shift(); if (seen.has(p)) continue; seen.add(p); (RAM_NEXT[p] || []).forEach(n => q.push(n)); } if (!seen.has('L') && !seen.has('R')) bad.push('pas de chemin vers une porte depuis ' + from); }
   for (let n = 1; n <= 6; n++) if (!NIGHTS[n] || !CALLS[n]) bad.push('nuit ' + n + ' incomplète');
   for (const [id] of Object.entries(MAP)) if (!rooms[id]) bad.push('caméra ' + id + ' sans pièce');
+  for (const id of LEO_ROOMS) if (!ADJ[id] || !(rooms[id] || MAP_DOORS[id])) bad.push('nuit 7 : pièce ' + id);
+  for (const id of Object.keys(DIST)) if (PAN[id] === undefined) bad.push('son : pièce ' + id);
   view.dataset.selfcheck = bad.join(' | ') || 'ok';
   // pour le test automatique de NeoDex : l'état, et la nuit qu'on peut faire défiler vite
-  cv.__ra = { get S() { return S; }, get scene() { return scene; }, get sceneT() { return sceneT; }, set scene(v) { scene = v; sceneT = 0; }, openDoc: id => { doc = DOCS().find(d => d.id === id); scene = "doc"; sceneT = 0; }, save, start, set speed(v) { speed = v; }, act, toggleCam, lure, reboot, pickFrag, tick: dt => tick(dt), sel: id => { S.sel = String(id); } };
+  cv.__ra = { get S() { return S; }, get scene() { return scene; }, get sceneT() { return sceneT; }, set scene(v) { scene = v; sceneT = 0; }, openDoc: id => { doc = DOCS().find(d => d.id === id); scene = "doc"; sceneT = 0; }, save, start, set speed(v) { speed = v; }, act, toggleCam, lure, reboot, repair, pickFrag, startLeo, leoMove, get L7() { return L7; }, tick: dt => tick(dt), sel: id => { S.sel = String(id); } };
 }
