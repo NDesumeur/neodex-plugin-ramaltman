@@ -663,57 +663,60 @@ const CSS = `
 .raWrap{position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;user-select:none}
 .raWrap canvas{display:block;background:#000;image-rendering:auto;outline:none;filter:none}
 `;
-// les messages de Gérard, l'ancien veilleur, au début de chaque nuit
+// les messages de Gérard, l'ancien veilleur, au début de chaque nuit (il parle de « monsieur Octet » comme d'un autre : c'est lui)
 const CALLS = {
   1: ["Allô ? Allô. Bon. Si tu entends ça, c'est que tu as pris le poste de veilleur de nuit chez Octet et Fils. Bienvenue.",
-    "Je fais court. Derrière toi, dans la vitrine, il y a la Pile : soixante-quatre gigas de RAM. Les dernières du pays, paraît-il. Ton boulot, c'est qu'elles soient encore là à six heures.",
-    "Il y a un… visiteur. Monsieur Altman. Ram Altman. L'ancien patron de ClosedRAM. Il s'est fait remplacer pièce par pièce, et maintenant il veut toute la RAM du monde. La nôtre aussi.",
+    "Je fais court. Derrière toi, dans la vitrine, il y a la Pile : soixante-quatre gigas de RAM. Ton boulot, c'est qu'elles soient encore là à six heures. Ne la vends pas, ne la prête pas, et ne l'ouvre jamais.",
+    "Il y a un… visiteur. Monsieur Altman. Ram Altman, le patron de ClosedRAM. On dit qu'il s'est fait remplacer pièce par pièce. On dit beaucoup de choses.",
     "Il marche la nuit. Surveille les caméras avec la barre en bas de l'écran. S'il est à ta porte, ferme-la. Les boutons sont à côté de chaque porte, la lumière aussi. Q et D pour les portes, A et E pour les lumières.",
-    "Mais attention : tout ça mange du courant. Plus de courant, plus de portes. Et lui, il sourit toujours. Bonne première nuit."],
-  2: ["Allô ? Bravo pour hier. Le précédent n'avait pas passé la première nuit. Bref.",
+    "Tout ça mange du courant. Plus de courant, plus de portes. Et lui, il sourit toujours. Bonne première nuit."],
+  2: ["Allô ? Bravo pour hier. Le précédent n'avait pas passé la première nuit. Moi, ça fait trente-neuf ans que je les passe. Bref.",
     "Le bâtiment est vieux : parfois la trappe se bloque, ou le courant fuit. Le moniteur du bureau te dit ce qui est en panne ; tu répares une chose à la fois.",
     "Ce soir, le Revendeur se réveille. Il dort au quai de livraison, caméra cinq. Tant que tu le regardes, il ne bouge pas. Si tu l'oublies, il part en courant par le couloir est.",
-    "S'il arrive et que ta porte droite est ouverte, il te pique seize gigas. Si elle est fermée, il tape dedans et ça te coûte du courant. Regarde-le de temps en temps, voilà."],
-  3: ["Allô ? Bon, mauvaise nouvelle : les Puces. De petites bêtes faites d'une barrette, avec des pattes. Elles remontent par la gaine de ventilation, caméra sept.",
+    "S'il arrive et que ta porte droite est ouverte, il te pique seize gigas. Si elle est fermée, il tape dedans et ça te coûte du courant. Il vend tout ce qu'il vole au même client. Tu devines lequel."],
+  3: ["Allô ? Les Puces, maintenant. Des barrettes qui ont des pattes. Elles remontent par la gaine de ventilation, caméra sept. D'où elles viennent ? De la poubelle de ClosedRAM, je crois. Ce qu'il a essayé, et qui ne lui allait pas.",
     "Quand tu les entends gratter au-dessus de toi, ferme la trappe. Touche V, ou l'interrupteur sur le bureau. Sinon elles descendent et elles mangent la Pile. Huit gigas à chaque fois.",
-    "Et Monsieur Altman a trouvé le couloir est. Il peut arriver des deux côtés, maintenant.",
-    "Autre chose : la nuit, il pirate parfois les caméras. Si l'écran dit « accès refusé », redémarre-les depuis le moniteur du bureau, touche R. Et si tu as besoin de l'éloigner, le leurre audio de la tablette joue un petit carillon dans la pièce que tu regardes. Il adore ce son. Il dit qu'il s'en souvient.",
-    "Ah, et si tu trouves des papiers qui traînent sur les caméras… ramasse-les. Le patron, monsieur Octet, il avait un fils. On n'en parle pas, ici."],
-  4: ["Allô ? Allô ? Je… je n'ai pas beaucoup de temps. Il m'a parlé, hier. Par la grille. Il disait qu'il voulait juste emprunter. Juste une barrette.",
-    "Ne lui ouvre pas. Il ne rend jamais rien. Et ne te fie pas à tes oreilles : il sait faire le carillon, maintenant. Il sait faire le bruit de ses pas ailleurs.",
-    "Si tu me vois dans le bureau… dis-moi de partir. Baisse ta tablette. Je ne sais plus toujours où je suis. Je cherche Léo. Il… attends. Tu entends ce sourire ?"],
-  5: ["… … Bonjour. C'est Ram. Gérard ne viendra plus. Il a partagé sa RAM. C'était très généreux.",
-    "Je ne suis pas méchant, tu sais. Je veux seulement que toute la mémoire du monde travaille ensemble. Dans mes serveurs.",
-    "Ouvre la porte. On en parle. Je souris, regarde."],
-  6: ["Tu es encore là ? Plus de messages. Plus personne. Seulement toi, la Pile, et moi.", "Tu as lu les papiers, n'est-ce pas. Alors tu sais ce qu'il y a dans la vitrine. Ce n'est pas à toi."],
+    "Et monsieur Altman a trouvé le couloir est. Il peut arriver des deux côtés, maintenant.",
+    "La nuit, il pirate parfois les caméras. Si l'écran dit « accès refusé », redémarre-les depuis le moniteur du bureau, touche R. Et si tu dois l'éloigner, le leurre audio de la tablette joue un carillon dans la pièce que tu regardes. C'est le carillon de la boutique. Il vient toujours voir qui entre. Déjà petit, il descendait en pyjama.",
+    "… Enfin. Ramasse les papiers qui traînent sur les caméras, si tu en vois. Monsieur Octet avait un fils. Il ne vient plus. Ou plutôt si. Mais ce n'est plus lui qui vient."],
+  4: ["Allô ? Je… je n'ai pas beaucoup de temps. Il m'a parlé, hier. Par la grille. Il commençait ses phrases avec la voix de Raymond, et il les finissait avec celle de… de Léo.",
+    "Il dit qu'il lui manque des morceaux. Que je les ai, moi. Dans ma tête. Ses premiers mots, la varicelle, le vélo rouge. Il dit que si je les lui donne, il saura enfin lequel des deux il est.",
+    "Ne lui ouvre pas. Et ne te fie pas à tes oreilles : il sait faire le carillon, maintenant. Il sait faire ses pas ailleurs.",
+    "Si tu me vois dans le bureau… dis-moi de partir. Baisse ta tablette. J'oublie où je suis. J'oublie l'année. Sa mère a commencé comme ça."],
+  5: ["… … Bonjour. C'est nous. Gérard est venu cette nuit. Il s'est assis par terre, il a fermé les yeux, et il m'a tout donné.",
+    "Je me souviens de mon enfance, maintenant. C'est étrange : je m'en souviens des deux côtés. Je me vois petit, et je me vois me regarder dormir.",
+    "Il ne manque presque rien. Soixante-quatre gigas. Ce que tu gardes derrière toi.",
+    "Je ne te veux pas de mal. Je veux finir de me souvenir. Ouvre."],
+  6: ["Plus de messages. Plus personne. Seulement toi, la Pile, et moi.",
+    "Tu as lu les papiers. Tu sais ce qu'il y a dans la vitrine. Tu sais aussi que Gérard l'a gardée trente-neuf ans sans jamais l'ouvrir, et sans jamais la casser. Demande-toi pourquoi. Moi, je me le demande toutes les nuits."],
 };
 // le lore : 8 fragments cachés dans les caméras (un par nuit, parfois deux), un journal à chaque matin, et la vraie fin
 const FRAGS = [
-  ['f1', 'Badge d\'employé', 'CLOSEDRAM — Ingénieur n° 1\nLÉO OCTET\nAccès : laboratoire PILE, tous niveaux.\n\nLa photo a été grattée. Quelqu\'un a dessiné un sourire par-dessus, au feutre.'],
-  ['f2', 'Note sur le frigo', 'Léo n\'est pas rentré. Raymond dit qu\'il travaille tard sur la PILE.\nIl souriait en le disant.\nJe n\'aime pas quand il sourit.\n\n— Gérard, 13 novembre 1987'],
-  ['f3', 'Brevet n° 87-1113', 'Procédé de sauvegarde intégrale d\'une conscience humaine sur mémoire vive.\nCapacité requise : 64 Go.\nÉtat de l\'art en 1987 : 640 Ko.\n\nInventeurs : R. Altman, L. Octet.'],
-  ['f4', 'Journal de test n° 12 (cassette)', 'Sujet : L.O.   Transfert : 61 %.\nLe sujet demande où est son père.\nLe sujet demande pourquoi il ne sent plus ses mains.\nLe sujet demande qui est l\'homme qui sourit dans le miroir.\n\nNote de R.A. : « Il faut plus de mémoire. »'],
-  ['f5', 'Bon de commande', '1 masque facial en silicone, modèle « R.A. »\nExpression : sourire, permanent.\nYeux : à fournir par le client.\n\nLivraison : Octet & Fils, porte de service, de nuit.'],
-  ['f6', 'Message vocal (cassette)', '« Papa ? C\'est moi. Je crois.\nIl me manque des bouts. Des prénoms. Ta voix.\nIl dit que s\'il trouve assez de RAM, je me souviendrai de tout.\nIl dit que ce n\'est pas lui qui a peur d\'oublier. C\'est moi. »'],
-  ['f7', 'Facture du Revendeur', 'Rachat de 4 000 barrettes, payé comptant.\nClient : M. R. Altman.\n\nNote du vendeur : « Le client a insisté. Il en faut toujours plus.\nIl oublie ce qu\'il a acheté la veille. »'],
-  ['f8', 'Photo déchirée', 'Deux jeunes hommes devant un garage, 1987.\nL\'un sourit. L\'autre a les yeux bleus.\n\nAu dos : « Raymond et moi, le jour où la PILE a démarré.\nSi un jour je ne me souviens plus, garde-la, papa. — L. »'],
+  ['f1', 'Badge d\'employé', 'CLOSEDRAM — Associé n° 1\nLÉO OCTET, 19 ans\nAccès : garage, tous niveaux.\n\nLa photo a été grattée à l\'ongle. Par-dessus, quelqu\'un a dessiné un sourire au feutre, en appuyant si fort que le carton est troué.'],
+  ['f2', 'Note sur le frigo', 'Léo,\nTa mère a commencé par oublier ses clés. Puis la rue. Puis mon prénom.\nJe sais pourquoi tu passes tes nuits au garage avec Raymond. Je ne suis pas d\'accord. Mais rentre manger.\n\n— Papa, 13 novembre 1987'],
+  ['f3', 'Brevet n° 87-1113', 'Procédé de copie d\'une mémoire humaine sur mémoire vive, à deux sujets :\nla SOURCE, que l\'on copie ;\nle TÉMOIN, dont la mémoire sert de modèle pour boucher les trous.\n\nRisque connu : à moins de 100 %, les deux sujets se mélangent.\nCapacité requise : 64 Go. État de l\'art en 1987 : 640 Ko.\n\nInventeurs : L. Octet (source), R. Altman (témoin).'],
+  ['f4', 'Journal de test n° 12 (cassette)', 'Enregistrement automatique. 13 novembre, 23 h 52.\nCoupure de courant. Transfert arrêté à 61 %.\nLe sujet demande où est son père.\nLe sujet demande pourquoi il sourit sans le vouloir.\nLe témoin ne répond plus.\nLe sujet dit : « Raymond est là. Il est dans moi. Il a peur du noir. Moi, je n\'ai jamais eu peur du noir. »'],
+  ['f5', 'Bon de commande', 'Commande passée par téléphone, janvier 1988.\n1 masque facial en silicone, d\'après la photo fournie (R. Altman).\nExpression : sourire, permanent.\nYeux : à fournir par le client.\n\nNote de l\'artisan : « Le client parlait de lui à la troisième personne. Puis au pluriel. »'],
+  ['f6', 'Message vocal (cassette)', '« Papa ? C\'est moi. Je crois.\nIl me manque des choses. Le prénom de maman. Ta voix.\nRaymond, lui, se souvient de tout. Il me prête ses souvenirs pour boucher les trous. Mais ce sont les siens.\nHier, j\'ai pleuré pour sa grand-mère. Je ne l\'ai jamais connue.\nRends-moi le reste. S\'il te plaît. Avant que je ne sois plus que lui. »'],
+  ['f7', 'Facture du Revendeur', 'Rachat de 4 000 barrettes d\'occasion, payé comptant. Client : ClosedRAM.\n\nNote du vendeur : « Il les veut usagées, avec ce qu\'il y a dessus. Des photos de vacances, des lettres, des listes de courses. Il dit qu\'il cherche une enfance à sa taille.\nCelles qui ne lui vont pas, il les jette dans la gaine. Elles bougent encore. »'],
+  ['f8', 'Photo déchirée', 'Deux jeunes hommes devant un garage, octobre 1987. L\'un sourit, l\'autre non.\n\nAu dos, deux écritures. La première : « Raymond et moi, le jour où la PILE a démarré. Si un jour je ne me souviens plus, montre-la-moi, papa. — L. »\n\nLa seconde, plus récente, tremblée : « Je la lui ai montrée. Il m\'a demandé lequel des deux il était. »'],
 ];
 const TAPES = ['f4', 'f6'];  // ces deux fragments sont des cassettes : on peut les écouter
-const EPI = ['Épilogue : Léo', 'Tu poses la main de métal sur la vitrine. Le veilleur ne crie pas. Il recule, puis il ouvre.\n\n64 Go. Tout revient d\'un coup : l\'odeur du garage, la voix de papa, ton prénom.\nLéo. Tu t\'appelles Léo.\n\nLe masque glisse et tombe. Dessous, il n\'y a pas de sourire.\n\nSur le répondeur de Gérard, un dernier message, ce matin-là : « Papa ? Je suis rentré. »'];
+const EPI = ['Épilogue : 100 %', 'Le veilleur te voit entrer. Il ne ferme pas la porte.\nIl a lu les papiers, lui aussi.\n\nTu ouvres la vitrine. 64 Go. Chargement : 100 %.\nTout revient : le garage, le vélo rouge, la voix de papa.\nEt la main sur le compteur, à 23 h 52. Tu t\'en souviens aussi.\nTu t\'en souviens de l\'intérieur.\n\nTu ouvres la bouche pour dire ton prénom.\nIl en sort trois.\n\nEn bas, le carillon sonne. Quelqu\'un entre dans la boutique.'];
 // pour les sons : distance au bureau (0 = à la porte) et côté (gauche −1, droite +1)
 const DIST = { 1: 4, 2: 3, 5: 4, 7: 3, 8: 3, 3: 2, 6: 2, 4: 1, L: 0, R: 0 }, PAN = { 1: 0, 2: 0, 5: .7, 7: .1, 8: -.6, 3: -.6, 6: .6, 4: -.8, L: -.9, R: .9 };
 const LEO_ROOMS = ['1', '2', '8', '3', '4', '6', 'L', 'R'], MAP_DOORS = { L: [30, 246], R: [226, 246] };
 const CHALL = ['SANS LEURRE', 'COURANT À 50 %', 'TABLETTE LENTE'];
 const FIXL = { cams: 'CAMÉRAS PIRATÉES', vent: 'TRAPPE BLOQUÉE', leak: 'FUITE DE COURANT' }, FIXK = { cams: 'R', vent: 'T', leak: 'P' };
 const NEWS = {
-  1: ['Le Courrier du Soir, 14 novembre 1987', 'DISPARITION D\'UN JEUNE INGÉNIEUR\n\nLéo Octet, 24 ans, n\'est pas rentré chez son père après une nuit au laboratoire de la jeune société ClosedRAM. Son associé, Raymond Altman, se dit « confiant » : « Léo est très présent. »'],
-  2: ['Le Courrier du Soir, 3 mars 1994', 'CLOSEDRAM RACHÈTE TOUTE LA MÉMOIRE DU PAYS\n\nEn une semaine, la société de Raymond Altman a acheté tous les stocks de barrettes. Son patron, que personne n\'a vu depuis des années, répond par écrit : « La mémoire doit travailler ensemble. »'],
-  3: ['Le Courrier du Soir, 9 juin 2003', 'RAYMOND ALTMAN SORT DE L\'OMBRE\n\nPremière apparition publique en seize ans. Le patron de ClosedRAM n\'a pas pris une ride. « Je n\'ai jamais été aussi présent », a-t-il dit, avant de sourire pendant onze minutes sans s\'arrêter.'],
-  4: ['Le Courrier du Soir, 2 février 2019', 'PÉNURIE MONDIALE DE RAM\n\nPlus une barrette en vente. Les entrepôts de ClosedRAM sont pleins, dit-on, mais ses serveurs « oublient » sans cesse. Un employé témoigne : « Il redémarre. Il demande où est son père. »'],
-  5: ['Le Courrier du Soir, hier', 'UN VEILLEUR DE NUIT DISPARAÎT CHEZ OCTET & FILS\n\nGérard M., 71 ans, ancien gardien de la petite entreprise familiale, n\'a pas été revu. Sur son répondeur, un dernier message : « Il est venu chercher le reste. »'],
-  6: ['Rapport de police, confidentiel', 'Le corps de Raymond Altman a été retrouvé hier dans l\'ancien garage de ClosedRAM.\nSelon le légiste, il est mort depuis environ 1987.\n\nQuestion du commissaire, au crayon dans la marge : « Alors qui porte son visage ? »'],
+  1: ['Le Courrier du Soir, 14 novembre 1987', 'DRAME DANS UN GARAGE DE LA RUE DES FORGES\n\nLéo Octet, 19 ans, fils d\'un réparateur du quartier, est dans le coma après un accident électrique dans l\'atelier familial. Son ami Raymond Altman, qui travaillait avec lui, reste introuvable. Le père, Gérard Octet, n\'a pas souhaité répondre à nos questions.'],
+  2: ['Le Courrier du Soir, 2 janvier 1988', 'LÉO OCTET S\'EST ÉTEINT\n\nLe jeune homme n\'a jamais repris connaissance. Le même jour, une société est déclarée au nom de Raymond Altman, toujours introuvable : ClosedRAM. Siège : une boîte postale. À la place de la signature, un sourire dessiné.'],
+  3: ['Le Courrier du Soir, 9 juin 2003', 'RAYMOND ALTMAN SORT DE L\'OMBRE\n\nPremière apparition publique du patron de ClosedRAM, qui rachète depuis quinze ans toute la mémoire qu\'il trouve. Il n\'a pas vieilli. Il a parlé une heure de « mémoire partagée », puis s\'est arrêté au milieu d\'une phrase pour demander à la salle si quelqu\'un avait vu son père.'],
+  4: ['Le Courrier du Soir, 2 février 2025', 'PÉNURIE MONDIALE DE MÉMOIRE\n\nPlus une barrette en vente : tout part dans les serveurs de ClosedRAM. Les ingénieurs s\'étonnent : la machine avale des milliards de souvenirs achetés, et n\'en garde aucun. « Elle les essaie, explique l\'un d\'eux, comme on essaie des vêtements. Aucun ne lui va. »'],
+  5: ['Le Courrier du Soir, hier', 'UN VIEUX GARDIEN DISPARAÎT\n\nGérard Octet, 79 ans, qui gardait seul sa boutique fermée depuis 1987, n\'a pas été revu. Sur son répondeur, un dernier message, enregistré à 23 h 52 : « J\'y vais. Je lui apporte ce que j\'ai. »'],
+  6: ['Rapport de police, confidentiel', 'Un corps a été retrouvé derrière une cloison de l\'ancien garage Octet : Raymond Altman, mort électrocuté vers 1987.\nLa cloison a été montée à la main, avec soin. Sur le plâtre, côté intérieur, une phrase au crayon :\n« Pardon. Je ne savais pas que vous étiez deux. »\n\nQuestion du commissaire, dans la marge : « Alors qui porte son visage depuis trente-neuf ans ? »'],
 };
-const TRUE_END = ['La vraie fin', 'Tu as tout lu. Tu sais.\n\nRaymond Altman est mort en 1987, le soir où la PILE a démarré. Ce qui marche dans les couloirs, c\'est Léo : sa mémoire coupée en morceaux, enfermée dans un corps de métal, sous le visage de l\'homme qui l\'a mis là.\n\nIl ne veut pas toute la RAM du monde. Il veut assez de place pour se souvenir de qui il est.\nLa Pile, ce sont les derniers 64 Go de lui que son père a cachés.\n\nÀ 6 h, tu ouvres la vitrine. Tu poses une barrette dans l\'encadrement de la porte.\nLe sourire ne bouge pas. Mais les yeux, pour la première fois, ne sont plus bleus.'];
+const TRUE_END = ['La vraie fin', 'Le 13 novembre 1987, à 23 h 52, Gérard a entendu son fils crier dans le garage. Il a coupé le courant.\n\nLe transfert s\'est arrêté à 61 %. Raymond, branché comme témoin, est mort sur sa chaise. Gérard l\'a muré. Puis il a retiré de la machine ce qui n\'était pas passé, 64 Go, et l\'a mis sous verre.\n\nCe qui marche dans les couloirs n\'est ni Léo ni Raymond. C\'est ce qui reste quand on coupe deux personnes en morceaux et qu\'on recolle les morceaux dans le noir. Il porte le visage de l\'un et cherche le père de l\'autre. Depuis, il remplit les trous avec la mémoire du monde entier, et le monde entier n\'a plus de mémoire.\n\nGérard n\'a jamais su s\'il gardait son fils ou s\'il l\'empêchait de revenir. Il a gardé la vitrine trente-neuf ans pour ne pas avoir à choisir.\n\nÀ 6 h, le téléphone sonne. Personne ne parle. C\'est à toi de ne pas choisir, maintenant.'];
 // les liens entre les pièces (pour le leurre audio : il ne vient que d'une pièce voisine)
 const ADJ = { 1: ['2'], 2: ['1', '3', '8', '6'], 8: ['2', '3'], 3: ['2', '8', '4'], 4: ['3', 'L'], 6: ['2', 'R'], L: ['4'], R: ['6'] };
 const FRAG_SPOTS = { 1: [[300, 470], [1000, 560]], 2: [[220, 600], [1060, 610]], 3: [[220, 470], [980, 560]], 4: [[1020, 450], [300, 600]], 5: [[200, 600], [1120, 600]], 6: [[1080, 440], [220, 600]], 8: [[230, 560], [900, 590]] };
@@ -836,7 +839,7 @@ export default async function (ctx) {
     if (!S.call && (S.leoT -= dt) <= 0) { S.leoT = 1e9; A.ring();
       const truth = R(10) < 7, others = ['1', '2', '3', '4', '6', '8'].filter(id => id !== S.ramPos), where = truth ? S.ramPos : others[R(others.length)];
       const hint = where === 'in' ? 'Il est derrière toi.' : /[LR]/.test(where) ? 'Il est à ta porte ' + (where === 'L' ? 'gauche' : 'droite') + '. Il attend.' : 'Il est à la caméra ' + where + '. ' + rooms[where].name.toLowerCase() + '. Je l\'entends penser.';
-      S.call = { lines: ['… Allô ? Papa ? … Non. Tu n\'es pas papa.', hint, R(2) ? 'Je ne sais plus si je mens. Il me manque des bouts.' : 'Ne le laisse pas prendre la Pile. C\'est moi, dedans.'], i: 0, t: -2.6, leo: true }; }
+      S.call = { lines: ['… Allô ? Papa ? … Non. Tu n\'es pas papa.', hint, R(2) ? "Je ne sais plus si je mens. Il me manque des bouts." : "Ne lui donne pas la Pile. Ou donne-la-lui. Je ne sais plus lequel de nous deux le demande."], i: 0, t: -2.6, leo: true }; }
     // Gérard : à force de rester dans les caméras, il entre dans le bureau ; on le fait partir en baissant la tablette
     if (S.n >= 4) { if (S.cam && !S.ger) { S.camHold += dt; if (S.camHold > Math.max(7, 15 - S.n)) { S.ger = 3.4; A.breath(0, .9); A.say('Léo ?', { rate: .7, pitch: .6, vol: .4 }); } } else if (!S.cam) S.camHold = 0;
       if (S.ger && S.cam && (S.ger -= dt) <= 0) { S.ger = null; S.camHold = 0; stealRam(8, 'gerard'); } }
@@ -872,7 +875,7 @@ export default async function (ctx) {
     if (who !== 'gerard') flash(`−${n} Go de RAM`, '#ff5a4a');
     if (S.ram <= 0) die('empty');
   }
-  const RAM_LINES = ['Juste une petite barrette…', 'Tu n\'as pas besoin de toute cette mémoire.', 'On partage ? Je souris, regarde.', 'Toute la RAM du monde. La tienne aussi.', 'Ouvre. C\'est pour l\'avenir.'];
+  const RAM_LINES = ["Juste une barrette. Après, j'arrête.","Je connais cette pièce. Je ne sais plus d'où.","Il me manque trente-neuf pour cent.","La mémoire doit travailler ensemble.","Tu as des souvenirs d'enfance ? Je peux les essayer ?","Ouvre. Je souris, regarde."];
   function ramLine() { const l = RAM_LINES[R(RAM_LINES.length)]; S.said = 3.5; S.saidText = l; A.say(l, { rate: .82, pitch: .5, vol: .55, alt: true }); }
   // ---- plus de courant : tout s'éteint, les portes s'ouvrent, et Ram arrive en fredonnant
   function powerOut() {
@@ -897,7 +900,7 @@ export default async function (ctx) {
   function die(why) {
     if (scene !== 'play') return;
     A.hush(); A.ambience(false); scene = 'jump'; sceneT = 0; S.why = why; S.side = S.ramPos === 'R' ? 'R' : 'L'; if (save.opts.calm) return A.glitch(); A.scream();
-    setTimeout(() => A.say(why === 'empty' ? 'Merci pour toute ta RAM.' : 'Ta RAM. Enfin.', { rate: .8, pitch: .4, alt: true }), 1700);
+    setTimeout(() => A.say(why === 'empty' ? "Merci. Je me souviens de toi, maintenant." : "Encore un peu de place.", { rate: .8, pitch: .4, alt: true }), 1700);
   }
 
   // ---------- dessin du bureau ----------
@@ -1087,7 +1090,7 @@ export default async function (ctx) {
       const c = S.call, line = c.lines[c.i];
       if (!c.spoken && c.t >= 0) { c.spoken = true; c.dur = Math.max(4, line.length * .062); A.say(line, c.leo ? { rate: .74, pitch: .15, vol: .8, alt: true } : { rate: 1.05, pitch: .9 }); if (c.leo) A.glitch(); }
       if (c.t > c.dur) { c.i++; c.t = 0; c.spoken = false; if (c.i >= c.lines.length) S.call = null; }
-      if (S.call) { rrect(g, 160, H - 210, W - 320, 110, 8, 'rgba(0,0,0,.72)', 'rgba(255,255,255,.25)', 2); g.fillStyle = '#ffd84a'; g.font = 'bold 14px Arial'; g.fillText(c.leo ? (c.t < 0 ? '☎ ÇA SONNE…' : '☎ APPEL DU 13/11/1987, 23 H 59 — LÉO ?') : S.n >= 5 ? '☎ NUMÉRO INCONNU' : '☎ MESSAGE DE GÉRARD, L\'ANCIEN VEILLEUR', 180, H - 186);
+      if (S.call) { rrect(g, 160, H - 210, W - 320, 110, 8, 'rgba(0,0,0,.72)', 'rgba(255,255,255,.25)', 2); g.fillStyle = '#ffd84a'; g.font = 'bold 14px Arial'; g.fillText(c.leo ? (c.t < 0 ? '☎ ÇA SONNE…' : '☎ APPEL DU 13/11/1987, 23 H 52 — LÉO ?') : S.n >= 5 ? '☎ NUMÉRO INCONNU' : '☎ MESSAGE DE GÉRARD, L\'ANCIEN VEILLEUR', 180, H - 186);
         g.fillStyle = c.leo ? '#b4f0ff' : '#eee'; g.font = '18px Georgia'; if (c.t >= 0) wrapText(c.leo && R(12) === 0 ? line.replace(/[aeiou]/g, '█') : line, 180, H - 160, W - 360, 24);
         rrect(g, W - 300, H - 202, 120, 26, 4, 'rgba(255,90,74,.25)', '#ff5a4a', 2); g.fillStyle = '#ff9a8a'; g.font = 'bold 12px Arial'; g.fillText('COUPER (C)', W - 280, H - 184); }
     }
@@ -1209,7 +1212,7 @@ export default async function (ctx) {
     drawMap(s);
     g.fillStyle = '#ccc'; g.font = 'bold 16px Consolas, monospace'; g.fillText('SOUPÇON', MAPX - 10, MAPY - 30); rrect(g, MAPX + 80, MAPY - 46, 240, 20, 4, 'rgba(255,255,255,.08)', '#666', 2); g.fillStyle = s.sus > .7 ? '#ff4a3a' : '#ffd84a'; g.fillRect(MAPX + 82, MAPY - 44, 236 * Math.min(1, s.sus), 16);
     if (s.end > .6) { g.fillStyle = 'rgba(0,0,0,.88)'; g.fillRect(0, 0, W, H); g.textAlign = 'center';
-      if (s.won) { g.fillStyle = '#7ef0b4'; g.font = '52px Impact, "Arial Black", sans-serif'; g.fillText('LÉO', W / 2, 150); g.fillStyle = '#ddd'; g.font = '20px Georgia'; let y = 210; for (const l of EPI[1].split('\n')) { g.fillText(l, W / 2, y); y += l ? 30 : 12; } button('FIN', W / 2 - 50, y + 20, 120, 50, () => { scene = 'title'; }); }
+      if (s.won) { g.fillStyle = '#7ef0b4'; g.font = '52px Impact, "Arial Black", sans-serif'; g.fillText('LÉO ?', W / 2, 150); g.fillStyle = '#ddd'; g.font = '20px Georgia'; let y = 210; for (const l of EPI[1].split('\n')) { g.fillText(l, W / 2, y); y += l ? 30 : 12; } button('FIN', W / 2 - 50, y + 20, 120, 50, () => { scene = 'title'; }); }
       else { g.fillStyle = '#ff5a4a'; g.font = '52px Impact, "Arial Black", sans-serif'; g.fillText('IL T\'A VU', W / 2, H / 2 - 40); g.fillStyle = '#ccc'; g.font = '22px Georgia'; g.fillText('Il ferme les portes. Tu oublies encore un peu.', W / 2, H / 2 + 6);
         button('RÉESSAYER', W / 2 - 220, H / 2 + 60, 220, 50, startLeo); button('MENU', W / 2 + 60, H / 2 + 60, 160, 50, () => { A.ambience(false); scene = 'title'; }); }
       g.textAlign = 'left'; }
