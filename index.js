@@ -494,9 +494,9 @@ function buildOffice() {
   g.fillStyle = 'rgba(120,180,255,.06)'; g.fillRect(700, 150, 520, 220); g.strokeStyle = 'rgba(255,255,255,.08)'; g.lineWidth = 3; g.beginPath(); g.moveTo(720, 360); g.lineTo(840, 160); g.moveTo(760, 360); g.lineTo(880, 160); g.stroke();
   // affiches
   g.save(); g.translate(590, 265); g.rotate(-.035); g.translate(-590, -265); rrect(g, 520, 170, 140, 190, 2, '#d9cfb4'); g.fillStyle = '#1a1a1a'; g.font = 'bold 18px Georgia'; g.fillText('OCTET', 556, 210); g.fillText('& FILS', 554, 234);
-  g.font = '12px Georgia'; ['depuis 1987', '', 'Votre RAM,', 'notre devoir.'].forEach((l, i) => g.fillText(l, 548, 270 + i * 18));
-  g.restore(); g.save(); g.translate(1340, 255); g.rotate(.05); g.translate(-1340, -255); rrect(g, 1260, 180, 160, 150, 2, '#2a2a30'); g.fillStyle = '#ff5a4a'; g.font = 'bold 15px Arial'; g.fillText('NE JAMAIS', 1290, 220); g.fillText('DONNER', 1300, 244); g.fillText('SA RAM', 1302, 268);
-  g.fillStyle = '#9aa'; g.font = '11px Arial'; g.fillText('(même s\'il sourit)', 1290, 300);
+  g.font = '12px Georgia'; ['depuis 1962', '', 'Radio · Télé', 'Réparations'].forEach((l, i) => g.fillText(l, 548, 270 + i * 18));
+  g.restore(); g.save(); g.translate(1340, 255); g.rotate(.05); g.translate(-1340, -255); rrect(g, 1260, 180, 160, 150, 2, '#2a2a30'); g.fillStyle = '#ff5a4a'; g.font = 'bold 15px Arial'; g.fillText('NE JAMAIS', 1290, 220); g.fillText('OUVRIR', 1306, 244); g.fillText('LA VITRINE', 1286, 268);
+  g.fillStyle = '#9aa'; g.font = '11px Arial'; g.fillText('— G.', 1330, 300);
   g.restore();
   // le bureau : plateau en bois sombre au premier plan
   poly(g, [380, 560, 1540, 560, 1640, 720, 280, 720], lin(g, 0, 560, 0, 720, [[0, '#4a3524'], [1, '#22170e']]));
@@ -694,13 +694,14 @@ const CALLS = {
 const FRAGS = [
   ['f1', 'Badge d\'employé', 'CLOSEDRAM — Associé n° 1\nLÉO OCTET, 19 ans\nAccès : garage, tous niveaux.\n\nLa photo a été grattée à l\'ongle. Par-dessus, quelqu\'un a dessiné un sourire au feutre, en appuyant si fort que le carton est troué.'],
   ['f2', 'Note sur le frigo', 'Léo,\nTa mère a commencé par oublier ses clés. Puis la rue. Puis mon prénom.\nJe sais pourquoi tu passes tes nuits au garage avec Raymond. Je ne suis pas d\'accord. Mais rentre manger.\n\n— Papa, 13 novembre 1987'],
-  ['f3', 'Brevet n° 87-1113', 'Procédé de copie d\'une mémoire humaine sur mémoire vive, à deux sujets :\nla SOURCE, que l\'on copie ;\nle TÉMOIN, dont la mémoire sert de modèle pour boucher les trous.\n\nRisque connu : à moins de 100 %, les deux sujets se mélangent.\nCapacité requise : 64 Go. État de l\'art en 1987 : 640 Ko.\n\nInventeurs : L. Octet (source), R. Altman (témoin).'],
+  ['f3', 'Brevet n° 87-1113', 'Procédé de copie d\'une mémoire humaine sur mémoire vive, à deux sujets :\nla SOURCE, que l\'on copie ;\nle TÉMOIN, dont la mémoire sert de modèle pour boucher les trous.\n\nRisque connu : à moins de 100 %, les deux sujets se mélangent.\nCapacité requise : inconnue. Plus on copie, plus il en faut.\n\nInventeurs : L. Octet (source), R. Altman (témoin).'],
   ['f4', 'Journal de test n° 12 (cassette)', 'Enregistrement automatique. 13 novembre, 23 h 52.\nCoupure de courant. Transfert arrêté à 61 %.\nLe sujet demande où est son père.\nLe sujet demande pourquoi il sourit sans le vouloir.\nLe témoin ne répond plus.\nLe sujet dit : « Raymond est là. Il est dans moi. Il a peur du noir. Moi, je n\'ai jamais eu peur du noir. »'],
   ['f5', 'Bon de commande', 'Commande passée par téléphone, janvier 1988.\n1 masque facial en silicone, d\'après la photo fournie (R. Altman).\nExpression : sourire, permanent.\nYeux : à fournir par le client.\n\nNote de l\'artisan : « Le client parlait de lui à la troisième personne. Puis au pluriel. »'],
   ['f6', 'Message vocal (cassette)', '« Papa ? C\'est moi. Je crois.\nIl me manque des choses. Le prénom de maman. Ta voix.\nRaymond, lui, se souvient de tout. Il me prête ses souvenirs pour boucher les trous. Mais ce sont les siens.\nHier, j\'ai pleuré pour sa grand-mère. Je ne l\'ai jamais connue.\nRends-moi le reste. S\'il te plaît. Avant que je ne sois plus que lui. »'],
   ['f7', 'Facture du Revendeur', 'Rachat de 4 000 barrettes d\'occasion, payé comptant. Client : ClosedRAM.\n\nNote du vendeur : « Il les veut usagées, avec ce qu\'il y a dessus. Des photos de vacances, des lettres, des listes de courses. Il dit qu\'il cherche une enfance à sa taille.\nCelles qui ne lui vont pas, il les jette dans la gaine. Elles bougent encore. »'],
   ['f8', 'Photo déchirée', 'Deux jeunes hommes devant un garage, octobre 1987. L\'un sourit, l\'autre non.\n\nAu dos, deux écritures. La première : « Raymond et moi, le jour où la PILE a démarré. Si un jour je ne me souviens plus, montre-la-moi, papa. — L. »\n\nLa seconde, plus récente, tremblée : « Je la lui ai montrée. Il m\'a demandé lequel des deux il était. »'],
 ];
+const EPIGR = { 1: '« Ne la vends pas. Ne la prête pas. Ne l\'ouvre jamais. »', 2: '« Trente-neuf ans que je les passe, ces nuits. »', 3: '« Déjà petit, il descendait en pyjama quand le carillon sonnait. »', 4: '« Sa mère a commencé par oublier ses clés. »', 5: '« Il m\'a tout donné. »', 6: '13 novembre. 23 h 52.' };
 const TAPES = ['f4', 'f6'];  // ces deux fragments sont des cassettes : on peut les écouter
 const EPI = ['Épilogue : 100 %', 'Le veilleur te voit entrer. Il ne ferme pas la porte.\nIl a lu les papiers, lui aussi.\n\nTu ouvres la vitrine. 64 Go. Chargement : 100 %.\nTout revient : le garage, le vélo rouge, la voix de papa.\nEt la main sur le compteur, à 23 h 52. Tu t\'en souviens aussi.\nTu t\'en souviens de l\'intérieur.\n\nTu ouvres la bouche pour dire ton prénom.\nIl en sort trois.\n\nEn bas, le carillon sonne. Quelqu\'un entre dans la boutique.'];
 // pour les sons : distance au bureau (0 = à la porte) et côté (gauche −1, droite +1)
@@ -711,17 +712,17 @@ const FIXL = { cams: 'CAMÉRAS PIRATÉES', vent: 'TRAPPE BLOQUÉE', leak: 'FUITE
 const NEWS = {
   1: ['Le Courrier du Soir, 14 novembre 1987', 'DRAME DANS UN GARAGE DE LA RUE DES FORGES\n\nLéo Octet, 19 ans, fils d\'un réparateur du quartier, est dans le coma après un accident électrique dans l\'atelier familial. Son ami Raymond Altman, qui travaillait avec lui, reste introuvable. Le père, Gérard Octet, n\'a pas souhaité répondre à nos questions.'],
   2: ['Le Courrier du Soir, 2 janvier 1988', 'LÉO OCTET S\'EST ÉTEINT\n\nLe jeune homme n\'a jamais repris connaissance. Le même jour, une société est déclarée au nom de Raymond Altman, toujours introuvable : ClosedRAM. Siège : une boîte postale. À la place de la signature, un sourire dessiné.'],
-  3: ['Le Courrier du Soir, 9 juin 2003', 'RAYMOND ALTMAN SORT DE L\'OMBRE\n\nPremière apparition publique du patron de ClosedRAM, qui rachète depuis quinze ans toute la mémoire qu\'il trouve. Il n\'a pas vieilli. Il a parlé une heure de « mémoire partagée », puis s\'est arrêté au milieu d\'une phrase pour demander à la salle si quelqu\'un avait vu son père.'],
+  3: ['Le Courrier du Soir, 9 juin 2003', 'RAYMOND ALTMAN SORT DE L\'OMBRE\n\nPremière apparition publique du patron de ClosedRAM, qui rachète depuis quinze ans toute la mémoire qu\'il trouve. Il se fait appeler « Ram », désormais : « Raymond, c\'était avant. » Il n\'a pas vieilli. Il a parlé une heure de « mémoire partagée », puis s\'est arrêté au milieu d\'une phrase pour demander à la salle si quelqu\'un avait vu son père.'],
   4: ['Le Courrier du Soir, 2 février 2025', 'PÉNURIE MONDIALE DE MÉMOIRE\n\nPlus une barrette en vente : tout part dans les serveurs de ClosedRAM. Les ingénieurs s\'étonnent : la machine avale des milliards de souvenirs achetés, et n\'en garde aucun. « Elle les essaie, explique l\'un d\'eux, comme on essaie des vêtements. Aucun ne lui va. »'],
   5: ['Le Courrier du Soir, hier', 'UN VIEUX GARDIEN DISPARAÎT\n\nGérard Octet, 79 ans, qui gardait seul sa boutique fermée depuis 1987, n\'a pas été revu. Sur son répondeur, un dernier message, enregistré à 23 h 52 : « J\'y vais. Je lui apporte ce que j\'ai. »'],
   6: ['Rapport de police, confidentiel', 'Un corps a été retrouvé derrière une cloison de l\'ancien garage Octet : Raymond Altman, mort électrocuté vers 1987.\nLa cloison a été montée à la main, avec soin. Sur le plâtre, côté intérieur, une phrase au crayon :\n« Pardon. Je ne savais pas que vous étiez deux. »\n\nQuestion du commissaire, dans la marge : « Alors qui porte son visage depuis trente-neuf ans ? »'],
 };
-const TRUE_END = ['La vraie fin', 'Le 13 novembre 1987, à 23 h 52, Gérard a entendu son fils crier dans le garage. Il a coupé le courant.\n\nLe transfert s\'est arrêté à 61 %. Raymond, branché comme témoin, est mort sur sa chaise. Gérard l\'a muré. Puis il a retiré de la machine ce qui n\'était pas passé, 64 Go, et l\'a mis sous verre.\n\nCe qui marche dans les couloirs n\'est ni Léo ni Raymond. C\'est ce qui reste quand on coupe deux personnes en morceaux et qu\'on recolle les morceaux dans le noir. Il porte le visage de l\'un et cherche le père de l\'autre. Depuis, il remplit les trous avec la mémoire du monde entier, et le monde entier n\'a plus de mémoire.\n\nGérard n\'a jamais su s\'il gardait son fils ou s\'il l\'empêchait de revenir. Il a gardé la vitrine trente-neuf ans pour ne pas avoir à choisir.\n\nÀ 6 h, le téléphone sonne. Personne ne parle. C\'est à toi de ne pas choisir, maintenant.'];
+const TRUE_END = ['La vraie fin', 'Le 13 novembre 1987, à 23 h 52, Gérard a entendu son fils crier dans le garage. Il a coupé le courant.\n\nLe transfert s\'est arrêté à 61 %. Raymond, branché comme témoin, est mort sur sa chaise. Gérard l\'a muré. Puis il a retiré de la machine ce qui n\'était pas passé et l\'a mis sous verre. Tous les dix ans, de peur qu\'il s\'efface, il l\'a recopié sur de la mémoire neuve : 640 Ko en 1987, 64 Go aujourd\'hui. Le reste de Léo n\'a pas grandi. C\'est la place qu\'il prend qui a grandi.\n\nCe qui marche dans les couloirs n\'est ni Léo ni Raymond. C\'est ce qui reste quand on coupe deux personnes en morceaux et qu\'on recolle les morceaux dans le noir. Il porte le visage de l\'un et cherche le père de l\'autre. Depuis, il remplit les trous avec la mémoire du monde entier, et le monde entier n\'a plus de mémoire.\n\nGérard n\'a jamais su s\'il gardait son fils ou s\'il l\'empêchait de revenir. Il a gardé la vitrine trente-neuf ans pour ne pas avoir à choisir.\n\nÀ 6 h, le téléphone sonne. Personne ne parle. C\'est à toi de ne pas choisir, maintenant.'];
 // les liens entre les pièces (pour le leurre audio : il ne vient que d'une pièce voisine)
 const ADJ = { 1: ['2'], 2: ['1', '3', '8', '6'], 8: ['2', '3'], 3: ['2', '8', '4'], 4: ['3', 'L'], 6: ['2', 'R'], L: ['4'], R: ['6'] };
 const FRAG_SPOTS = { 1: [[300, 470], [1000, 560]], 2: [[220, 600], [1060, 610]], 3: [[220, 470], [980, 560]], 4: [[1020, 450], [300, 600]], 5: [[200, 600], [1120, 600]], 6: [[1080, 440], [220, 600]], 8: [[230, 560], [900, 590]] };
 // l'agressivité de chacun, nuit par nuit (0 = ne bouge pas, 20 = au maximum) : [Ram, Revendeur, Puces]
-const NIGHTS = { 1: [2, 0, 0], 2: [4, 2, 0], 3: [6, 5, 4], 4: [9, 8, 7], 5: [12, 11, 10], 6: [16, 15, 14] };
+const NIGHTS = { 1: [2, 0, 0], 2: [4, 2, 0], 3: [6, 5, 4], 4: [9, 8, 7], 5: [12, 10, 9], 6: [15, 13, 12] };
 const RAM_NEXT = { 1: ['2'], 2: ['3', '8', '6'], 8: ['3', '2'], 3: ['4'], 4: ['L'], 6: ['R'] };
 const HOUR = ['00 H', '01 H', '02 H', '03 H', '04 H', '05 H', '06 H'];
 // le plan des caméras : position du bouton sur la carte (en bas à droite)
@@ -786,7 +787,7 @@ export default async function (ctx) {
     // le courant
     if (!S.out) {
       S.usage = Math.min(5, 1 + S.doorL + S.doorR + S.vent + (S.lightL || S.lightR ? 1 : 0) + (S.cam ? 1 : 0) + (S.fix ? 1 : 0) + (S.fault.leak ? 2 : 0));
-      const base = .085 + S.n * .006 + (S.n >= 2 ? .01 : 0);
+      const base = .068 + Math.min(S.n, 6) * .001;  // réglé avec un joueur automatique parfait : il finit la nuit 6 avec ~10-20 %
       S.power -= S.usage * base * dt;
       if (S.power <= 0) powerOut();
     } else return outTick(dt);
@@ -822,7 +823,7 @@ export default async function (ctx) {
     // un fragment apparaît quelques secondes dans une caméra (au plus deux par nuit, tant qu'il en reste à trouver)
     const left = FRAGS.filter(f => !save.docs.includes(f[0]));
     if (S.frag) { S.frag.t -= dt; if (S.frag.t <= 0) S.frag = null; }
-    else if (left.length && S.fragN < 2 && (S.fragT -= dt) <= 0) { const cams = Object.keys(FRAG_SPOTS), cam = cams[R(cams.length)], sp = FRAG_SPOTS[cam][R(2)]; S.frag = { id: left[0][0], cam, x: sp[0], y: sp[1], t: 14 }; S.fragN++; S.fragT = 60 + Math.random() * 120; }
+    else if (left.length && S.fragN < 2 && (S.fragT -= dt) <= 0) { const cams = Object.keys(FRAG_SPOTS), cam = cams[R(cams.length)], sp = FRAG_SPOTS[cam][R(2)]; S.frag = { id: left[0][0], cam, x: sp[0], y: sp[1], t: 24 }; S.mark = { cam, t: 4, k: 'papier' }; A.tick(); S.fragN++; S.fragT = 60 + Math.random() * 120; }
     // le leurre : deux secondes plus tard, s'il est dans une pièce voisine, il vient voir (les Puces, elles, reculent)
     if (S.lureCd > 0) S.lureCd -= dt;
     if (S.lure && (S.lure.t -= dt) <= 0) { const c = S.lure.cam; S.lure = null;
@@ -854,7 +855,7 @@ export default async function (ctx) {
       if (before > 2 && S.scRun <= 2) A.run();
       if (S.scRun <= 0) {
         S.scRun = 0;
-        if (S.doorR) { A.bang(.8); S.power -= 2 + S.events.filter(e => e === 'bang').length * 3; S.events.push('bang'); S.scStage = R(2); flash('Le Revendeur tape à la porte : −courant', '#ffd84a'); }
+        if (S.doorR) { A.bang(.8); S.power -= 2 + Math.min(3, S.events.filter(e => e === 'bang').length); S.events.push('bang'); S.scStage = R(2); flash('Le Revendeur tape à la porte : −courant', '#ffd84a'); }
         else { S.scStage = 0; stealRam(16, 'scalper'); }
       }
     }
@@ -939,6 +940,20 @@ export default async function (ctx) {
     g.fillStyle = '#c8c8c0'; g.font = 'bold 11px Arial'; g.textAlign = 'center'; g.fillText(label, x, y + 38); g.textAlign = 'left';
   }
   const PANELS = { L: [480, 290, 360], R: [1440, 290, 360] };
+  // les objets qui apparaissent sur le bureau, une nuit après l'autre (la nuit perso les a tous)
+  function drawProps(p, dark) {
+    const n = S.n, k = dark ? .35 : 1;
+    g.save(); g.globalAlpha = k;
+    if (n >= 2) { const x = 1200 - p; g.save(); g.translate(x, 640); g.rotate(-.12); rrect(g, -44, -26, 88, 52, 4, '#1c1c20', '#55595e', 2); rrect(g, -34, -18, 68, 14, 2, '#d8c89a'); g.fillStyle = '#1a1a1a'; g.font = 'italic 10px Georgia'; g.fillText('L. — test 12', -30, -7);
+      for (const cx of [-16, 16]) { g.fillStyle = '#c8c0a8'; g.beginPath(); g.arc(cx, 10, 8, 0, 7); g.fill(); g.fillStyle = '#1c1c20'; g.beginPath(); g.arc(cx, 10, 3, 0, 7); g.fill(); } g.restore(); }
+    if (n >= 3) { const x = 1455 - p; g.save(); g.translate(x, 532); g.rotate(.14); rrect(g, -28, -36, 56, 72, 2, '#e8e0cc'); g.fillStyle = '#4a4438'; g.fillRect(-23, -31, 46, 50);
+      g.fillStyle = '#8a7e66'; for (const fx of [-11, 11]) { g.beginPath(); g.arc(fx, -12, 6, 0, 7); g.fill(); g.fillRect(fx - 7, -6, 14, 22); } g.strokeStyle = '#e8e0cc'; g.lineWidth = 2; g.beginPath(); g.moveTo(-23, 19); g.lineTo(-4, -31); g.stroke(); g.restore(); }
+    if (n >= 4) { const x = 1440 - p; soft(g, 2, () => { g.beginPath(); g.ellipse(x + 30, 628, 36, 9, -.12, 0, 7); }, '#1a2234'); soft(g, 3, () => { g.beginPath(); g.ellipse(x, 624, 50, 30, -.08, Math.PI, 0); g.closePath(); }, '#33415e'); g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(x - 40, 606, 60, 4);
+      g.fillStyle = '#c9a43a'; g.fillRect(x - 9, 604, 18, 10); }
+    if (n >= 5) { const x = 760 - p; g.save(); g.translate(x, 404); g.rotate(.08); rrect(g, -34, -26, 68, 52, 1, '#f2e27a'); g.fillStyle = '#2a2a2a'; g.font = 'italic 12px Georgia'; g.fillText('J\'y vais.', -26, -4); g.fillText('— G.', -6, 14); g.restore(); }
+    if (n >= 6) { const cx = 1210 - p; g.strokeStyle = 'rgba(150,20,20,.75)'; g.lineWidth = 5; g.lineCap = 'round'; g.beginPath(); g.arc(cx, 492, 46, .2, Math.PI - .2); g.stroke(); g.lineCap = 'butt'; }
+    g.restore();
+  }
   function drawOffice() {
     const p = S.pan, dark = S.out ? 1 : 0;
     g.drawImage(office.c, p, 0, W, H, 0, 0, W, H);
@@ -961,6 +976,7 @@ export default async function (ctx) {
     for (let i = 0; i < 8; i++) { const bx = cx + 14 + i * 30; if (i < n) { rrect(g, bx, 486, 20, 60, 2, '#1f8a52'); g.fillStyle = '#0c0c10'; for (let k = 0; k < 3; k++) g.fillRect(bx + 4, 492 + k * 16, 12, 10); g.fillStyle = '#d8b14a'; g.fillRect(bx + 1, 542, 18, 3); if (!dark) glow(g, bx + 10, 516, 30, '60,255,150', .12); } else { g.strokeStyle = 'rgba(255,255,255,.12)'; g.strokeRect(bx, 486, 20, 60); } }
     g.fillStyle = 'rgba(255,255,255,.1)'; g.fillRect(cx + 6, 476, 248, 6);
     g.fillStyle = '#9ad8b4'; g.font = 'bold 12px Arial'; g.fillText('LA PILE · ' + S.ram + ' Go', cx + 8, 462);
+    drawProps(p, dark);
     // l'interrupteur de la trappe, sur le bureau
     const tx = 880 - p; rrect(g, tx, 600, 110, 56, 6, '#202226', '#55595e', 3); rrect(g, tx + 12 + (S.vent ? 50 : 0), 610, 36, 36, 4, S.vent ? '#d8a820' : '#4a4e54');
     g.fillStyle = '#c8c8c0'; g.font = 'bold 11px Arial'; g.fillText('TRAPPE (V)', tx + 18, 672);
@@ -1042,7 +1058,7 @@ export default async function (ctx) {
   }
   function lure() {
     if (!S.cam || S.hacked || S.lureCd > 0 || S.ch[0]) return A.deny();
-    S.lure = { cam: String(S.sel), t: 2 }; S.lureCd = 14; S.power -= 1.5; A.lure();
+    S.lure = { cam: String(S.sel), t: 2 }; S.lureCd = 14; S.power -= .5; A.lure();
   }
   function drawMap(Lv) {
     rrect(g, MAPX - 10, MAPY - 10, 330, 290, 6, 'rgba(0,0,0,.55)', 'rgba(255,255,255,.25)', 2);
@@ -1053,7 +1069,7 @@ export default async function (ctx) {
     rrect(g, MAPX + 120, MAPY + 222, 80, 40, 3, 'rgba(255,255,255,.15)', '#ddd', 2); g.fillStyle = '#ddd'; g.font = 'bold 12px Arial'; g.fillText('TOI', MAPX + 148, MAPY + 247);
     for (const [id, [x, y]] of Object.entries(Lv ? { ...MAP, ...MAP_DOORS } : MAP)) { const on = Lv ? Lv.pos === id || (Lv.mv && Lv.mv.to === id) : String(S.sel) === id; rrect(g, MAPX + x, MAPY + y, 60, 28, 3, on ? '#7ef0b4' : '#2a2e33', '#9aa', 2); g.fillStyle = on ? '#000' : '#ddd'; g.font = 'bold 13px Arial'; if (/[LR]/.test(id)) g.font = 'bold 11px Arial'; g.fillText(/[LR]/.test(id) ? 'PORTE ' + (id === 'L' ? 'G' : 'D') : 'CAM ' + id, MAPX + x + 6, MAPY + y + 19);
       if (Lv && (Lv.eye === id || (Lv.next === id && T % .3 < .15))) { g.strokeStyle = Lv.eye === id ? '#ff3a2a' : '#ffd84a'; g.lineWidth = 3; g.strokeRect(MAPX + x - 5, MAPY + y - 5, 70, 38); } }
-    if (!Lv && S.mark && MAP[S.mark.cam]) { const [x, y] = MAP[S.mark.cam]; g.globalAlpha = Math.min(1, S.mark.t); g.fillStyle = '#ffd84a'; g.font = 'bold 13px Arial'; g.fillText(S.mark.k === '♪' ? '♪ carillon' : '≈ pas', MAPX + x, MAPY + y - 4); g.globalAlpha = 1; }
+    if (!Lv && S.mark && MAP[S.mark.cam]) { const [x, y] = MAP[S.mark.cam]; g.globalAlpha = Math.min(1, S.mark.t); g.fillStyle = '#ffd84a'; g.font = 'bold 13px Arial'; g.fillText(S.mark.k === '♪' ? '♪ carillon' : S.mark.k === 'papier' ? '□ papier' : '≈ pas', MAPX + x, MAPY + y - 4); g.globalAlpha = 1; }
   }
   // Gérard, le père de Léo : un vieil homme en casquette de gardien, le visage blême, les yeux creux
   function drawGerard(x, y, s, a) {
@@ -1128,7 +1144,7 @@ export default async function (ctx) {
     g.fillStyle = '#05080a'; g.fillRect(0, 0, W, H);
     rrect(g, 200, 70, 880, 560, 10, '#0c1612', '#2a4a3a', 3);
     g.fillStyle = '#7ef0b4'; g.font = '18px Consolas, monospace';
-    const L = ['De : Ressources humaines, Octet & Fils', 'À : toi', 'Objet : Poste de veilleur de nuit (00 h – 06 h)', '', 'Bonjour,', '', 'Suite à votre candidature, nous avons le plaisir de vous confier', 'la surveillance de la Pile : 64 Go de RAM, notre dernier stock.', '', 'Salaire : 120 € la semaine. Café fourni.', '', 'Octet & Fils décline toute responsabilité en cas de :', '  - barrettes volées ;', '  - sourires persistants ;', '  - rencontre avec Monsieur R. Altman (ClosedRAM).', '', 'Bonne prise de poste.', '', '                 [ cliquer pour commencer ]'];
+    const L = ["De : Octet & Fils","À : veilleur de nuit n° 41","Objet : prise de poste, 00 h – 06 h","","Vous gardez la vitrine du bureau.","Elle contient 64 Go de mémoire. Elle n'est pas à vendre.","","Vous ne l'ouvrez pas.","Vous ne la prêtez pas.","Vous ne parlez pas au visiteur.","","Les quarante veilleurs précédents ont démissionné.","Aucun n'a rendu son badge.","","Le téléphone vous expliquera le reste.","","                 [ cliquer pour commencer ]"];
     const shown = Math.floor(sceneT * 40); let n = 0;
     L.forEach((l, i) => { const part = l.slice(0, Math.max(0, shown - n)); n += l.length + 4; g.fillText(part, 240, 120 + i * 26); });
     post(g, T, .08, .6);
@@ -1220,7 +1236,7 @@ export default async function (ctx) {
   function drawCard() {
     g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
     const a = Math.min(1, sceneT, Math.max(0, 3 - sceneT)); g.globalAlpha = a; g.fillStyle = '#ececec'; g.textAlign = 'center';
-    g.font = '64px Impact, "Arial Black", sans-serif'; g.fillText('00 H', W / 2, H / 2 - 10); g.font = '30px Impact, "Arial Black", sans-serif'; g.fillText(S.n === 7 ? 'NUIT PERSO' : 'NUIT ' + S.n, W / 2, H / 2 + 40);
+    g.font = '64px Impact, "Arial Black", sans-serif'; g.fillText('00 H', W / 2, H / 2 - 10); g.font = '30px Impact, "Arial Black", sans-serif'; g.fillText(S.n === 7 ? 'NUIT PERSO' : 'NUIT ' + S.n, W / 2, H / 2 + 40); if (EPIGR[S.n]) { g.font = 'italic 18px Georgia'; g.fillStyle = '#9a9a9a'; g.fillText(EPIGR[S.n], W / 2, H / 2 + 100); }
     g.textAlign = 'left'; g.globalAlpha = 1; post(g, T, .12, .6);
     if (sceneT > 3) { scene = 'play'; A.ambience(true); }
   }
@@ -1305,7 +1321,8 @@ export default async function (ctx) {
 
   // ---------- les commandes ----------
   const toCanvas = e => { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height }; };
-  const repair = w => { if (!faults().includes(w) || S.fix || S.out || S.ramPos === 'in') return A.deny(); S.fix = { w, t: 4 }; A.reboot(); };
+  const repair = w => { if (!faults().includes(w) || S.fix || S.out || S.ramPos === 'in') return A.deny(); S.fix = { w, t: 4 }; S.power -= 1; A.reboot(); A.bang(0);
+    const near = { 3: '4', 4: 'L', 6: 'R' }[S.ramPos]; if (near && R(2)) { S.ramPos = near; S.ramT = 0; stepAt(near); S.mark = { cam: near, t: 2.5, k: 'pas' }; if (/[LR]/.test(near)) S.doorWait = Math.max(2.6, 7.5 - S.ai.ram * .22); } };
   const reboot = () => repair('cams');
   const toggleCam = () => { if (S.out) return A.deny(); S.cam = !S.cam; if (S.cam) { S.lightL = S.lightR = false; A.camUp(); } else { A.camSwitch(); if (S.ramPos === 'in') return die('ram'); if (S.ger) { S.ger = null; S.camHold = 0; S.gerSeen = 1.4; A.glitch(); flash('Gérard repart dans le noir…', '#9ad8b4'); } } };
   const act = {
