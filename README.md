@@ -1,8 +1,8 @@
 # Ram Altman
 
-Un jeu d'horreur et de survie. Tu es veilleur de nuit chez **Octet & Fils**. Ton travail : garder **la Pile**, les 64 derniers Go de RAM du pays, de minuit à 6 h.
+Un jeu d'horreur et de survie. Tu es veilleur de nuit chez **Brockman & Fils**, une vieille boutique de radios. Ton travail : garder **la Barrette**, une barrette de mémoire de 64 Go sous verre, de minuit à 6 h.
 
-Le problème, c'est **Ram Altman**, le patron de ClosedRAM. C'est le nom qu'il se donne, en tout cas. Il rachète toute la mémoire du monde, il n'a pas vieilli depuis 1987, et il sourit tout le temps. Ce soir, il veut la tienne.
+Le problème, c'est **Ram Altman**, le patron de ClosedRAM : un robot qui porte un visage d'homme, et qui rachète toute la mémoire du monde. Ce soir, il veut la Barrette.
 
 *English version: [README.en.md](README.en.md)*
 
@@ -31,14 +31,16 @@ Tout consomme du courant : portes, lumières, trappe, caméras. À 0 %, tout s'�
 
 ## L'histoire
 
-Pourquoi l'horloge des caméras est-elle bloquée au 13 novembre 1987 ? Qui était Léo Octet ? Des papiers traînent parfois sur les caméras (la carte signale « papier ») : clique dessus pour les ramasser. Et le bureau change d'une nuit à l'autre : regarde ce qui apparaît sur la table. Chaque nuit gagnée ajoute aussi un article de journal. Tout se relit dans les **Archives** du menu, et qui trouve les 8 fragments puis tient la nuit 6 découvre la vraie fin. Deux des fragments sont des cassettes, à écouter. La nuit, le vieux répondeur de la boutique repasse parfois tout bas des messages de 1987. Et si tu as tout trouvé, la nuit 6 se termine sur un choix, avec deux fins.
+En 1987, Léo Brockman et son ami Raymond Altman ont construit **MNÉMO** (Machine Numérique d'Échange de Mémoire Organique), pour copier la mémoire de Léo sur de la RAM. Pendant la copie, le courant a été coupé. Ce qui s'est passé ensuite, c'est à toi de le découvrir.
+
+Des papiers traînent parfois sur les caméras (la carte signale « papier ») : clique dessus pour les ramasser. Et le bureau change d'une nuit à l'autre : regarde ce qui apparaît sur la table. Chaque nuit gagnée ajoute aussi un article de journal. Tout se relit dans les **Archives** du menu, avec la page **Ce que tu sais**, qui résume en phrases simples ce que tu as compris jusqu'ici. Qui trouve les 8 fragments puis tient la nuit 6 découvre la vraie fin. Deux des fragments sont des cassettes, à écouter. La nuit, le vieux répondeur de la boutique repasse parfois tout bas des messages de 1987. Et si tu as tout trouvé, la nuit 6 se termine sur un choix, avec deux fins.
 
 ## Nuits
 
 - La nuit 1 commence par un petit tutoriel, avec des flèches (il se rejoue depuis les Réglages).
 
 - À la fin de chaque nuit, un compte rendu : courant restant, barrettes perdues, réparations, et ton record de courant.
-- 6 nuits, de plus en plus dures, chacune avec son message au téléphone (sous-titré, avec des voix murmurées propres au jeu).
+- 6 nuits, de plus en plus dures, chacune avec son message au téléphone (parlé et sous-titré, en français ou en anglais).
 - **Nuit perso** : règle chaque menace de 0 à 20, et ajoute des défis (sans leurre, courant à 50 %, tablette lente). Un défi gagné avec chaque menace à 10 ou plus donne une médaille.
 - **Nuit 7** : cachée, elle s'ouvre après la vraie fin. Cette fois, tu es Léo, et c'est le veilleur qui te cherche aux caméras.
 - **Trois étoiles** : finir la nuit 5, la nuit 6, puis la nuit perso en 20 / 20 / 20.
@@ -51,7 +53,9 @@ La nuit atteinte, les étoiles, les documents trouvés et les réglages de la nu
 
 Des sauts au visage, des cris et des bruits soudains. Dans les **Réglages** : volume des bruits et des voix, son coupé, langue (français ou anglais, par défaut celle de NeoDex), vitesse du regard, et sauts au visage atténués (pas de cri ni d'hallucinations).
 
-Ram Altman est un personnage inventé : le nom fait sourire, l'histoire beaucoup moins. Tout est dessiné au pinceau du canvas (aucune image) et tous les sons sont fabriqués en direct.
+Tous les personnages sont inventés : les noms font sourire, l'histoire beaucoup moins. Tout est dessiné au pinceau du canvas (aucune image) et les bruits sont fabriqués en direct.
+
+Les voix sont faites avec [Piper](https://github.com/rhasspy/piper) et ces voix libres : *fr_FR-mls-medium* (données [MLS](http://openslr.org/94/), CC BY 4.0), *en_US-libritts_r-medium* (données [LibriTTS-R](http://www.openslr.org/141/), CC BY 4.0) et *en_US-joe-medium* (CC0).
 
 ## Installer
 

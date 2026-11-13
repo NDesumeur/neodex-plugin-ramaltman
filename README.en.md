@@ -1,8 +1,8 @@
 # Ram Altman
 
-A survival horror game. You are the night guard at **Octet & Fils**. Your job: keep **the Stack**, the country's last 64 GB of RAM, safe from midnight to 6 AM.
+A survival horror game. You are the night guard at **Brockman & Sons**, an old radio shop. Your job: keep **the Stick**, a 64 GB memory stick under glass, safe from midnight to 6 AM.
 
-The problem is **Ram Altman**, the head of ClosedRAM. That's the name he goes by, anyway. He buys up all the memory in the world, he hasn't aged since 1987, and he never stops smiling. Tonight, he wants yours.
+The problem is **Ram Altman**, the head of ClosedRAM: a robot wearing a man's face, who buys up all the memory in the world. Tonight, he wants the Stick.
 
 *Version française : [README.md](README.md)*
 
@@ -33,14 +33,16 @@ Everything uses power: doors, lights, hatch, cameras. At 0%, everything goes dar
 
 ## The story
 
-Why is the camera clock stuck on November 13, 1987? Who was Léo Octet? Papers sometimes lie on the cameras (the map says "papier"): click them to pick them up. And the office changes from night to night: watch what appears on the desk. Every night you win also adds a newspaper clipping. Everything can be reread in the **Archives** from the menu, and whoever finds all 8 fragments and survives night 6 gets the true ending. Two of the fragments are tapes you can listen to. At night, the shop's old answering machine sometimes plays 1987 messages, very low. And if you found everything, night 6 ends with a choice and two endings.
+In 1987, Léo Brockman and his friend Raymond Altman built **MNEMO** (Mind-to-Network Exchange of Memory, Organic), to copy Léo's memory onto RAM. During the copy, the power was cut. What happened next is yours to find out.
+
+Papers sometimes lie on the cameras (the map says "papier"): click them to pick them up. And the office changes from night to night: watch what appears on the desk. Every night you win also adds a newspaper clipping. Everything can be reread in the **Archives** from the menu, with the **What you know** page, which sums up in plain sentences what you have understood so far. Whoever finds all 8 fragments and survives night 6 gets the true ending. Two of the fragments are tapes you can listen to. At night, the shop's old answering machine sometimes plays 1987 messages, very low. And if you found everything, night 6 ends with a choice and two endings.
 
 ## Nights
 
 - Night 1 starts with a short tutorial with arrows (replay it from Settings).
 
 - After each night, a report: power left, sticks lost, repairs, and your power record.
-- 6 nights, each harder, each with its phone message (subtitled, with the game's own murmured voices).
+- 6 nights, each harder, each with its phone message (spoken and subtitled, in English or French).
 - **Custom night**: set each threat from 0 to 20, and add challenges (no lure, 50% power, slow tablet). A challenge won with every threat at 10 or more earns a medal.
 - **Night 7**: hidden, it unlocks after the true ending. This time you are Léo, and the guard is looking for you on the cameras.
 - **Three stars**: beat night 5, night 6, then the custom night at 20 / 20 / 20.
@@ -53,7 +55,9 @@ The night reached, the stars, the documents found and the custom night settings 
 
 Jumpscares, screams and sudden noises. In **Settings**: sound and voice volume, mute, language (French or English, NeoDex's by default), look speed, and softened jumpscares (no scream, no hallucinations).
 
-Ram Altman is a made-up character: the name is a joke, the story is not. Everything is painted with the canvas brush (no images) and every sound is made live.
+All characters are made up: the names are a joke, the story is not. Everything is painted with the canvas brush (no images) and the sounds are made live.
+
+The voices are made with [Piper](https://github.com/rhasspy/piper) and these free voices: *fr_FR-mls-medium* ([MLS](http://openslr.org/94/) data, CC BY 4.0), *en_US-libritts_r-medium* ([LibriTTS-R](http://www.openslr.org/141/) data, CC BY 4.0) and *en_US-joe-medium* (CC0).
 
 ## Install
 
