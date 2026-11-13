@@ -23,20 +23,21 @@ Le problème, c'est **Ram Altman**, le patron de ClosedRAM. C'est le nom qu'il s
 
 - **Le leurre audio** (touche **L**, ou le bouton au-dessus de la carte) joue un carillon dans la pièce que tu regardes. Si Ram est dans une pièce voisine, il vient voir : c'est le moyen de l'éloigner d'une porte. Sur la caméra 7, il fait reculer les Puces. Il coûte un peu de courant et doit recharger.
 - **Les pannes** (à partir de la nuit 2) : Ram pirate parfois les caméras (« accès refusé »), la trappe se bloque, le courant fuit. Le moniteur du bureau dit ce qui est en panne ; on répare une chose à la fois, en 4 secondes : **R** caméras, **T** trappe, **P** courant (ou clic sur la ligne du moniteur). Mais réparer coûte du courant et fait du bruit : s'il est tout près, il l'entend et avance.
-- **Gérard** (à partir de la nuit 4), le père de Léo, entre dans le bureau si tu restes trop longtemps dans les caméras. Baisse la tablette pour qu'il reparte, sinon il prend une barrette « pour Léo ».
-- **Tes oreilles** : les pas de Ram sont plus forts quand il est près, à gauche ou à droite, et les micros des pièces proches les signalent sur la carte. Mais à partir de la nuit 4, il imite le carillon et ses propres pas dans une autre pièce.
+- **Gérard** (à partir de la nuit 4), le père de Léo, entre dans le bureau si tu restes trop longtemps dans les caméras, et il te parle, de plus en plus perdu. Baisse la tablette pour qu'il reparte, sinon il prend une barrette « pour Léo ».
+- **Tes oreilles** : les pas de Ram sont plus forts quand il est près, à gauche ou à droite, et les micros des pièces proches les signalent sur la carte. Mais à partir de la nuit 4, il imite le carillon et ses propres pas dans une autre pièce. Écoute plutôt le silence : quand même le bruit de fond se tait, c'est qu'il est à une pièce de toi.
 - **Le téléphone** sonne parfois en pleine nuit : c'est Léo. Il te dit où est Ram… et ne dit pas toujours vrai.
 
 Tout consomme du courant : portes, lumières, trappe, caméras. À 0 %, tout s'éteint… et Ram arrive en fredonnant.
 
 ## L'histoire
 
-Pourquoi l'horloge des caméras est-elle bloquée au 13 novembre 1987 ? Qui était Léo Octet ? Des papiers traînent parfois sur les caméras (la carte signale « papier ») : clique dessus pour les ramasser. Et le bureau change d'une nuit à l'autre : regarde ce qui apparaît sur la table. Chaque nuit gagnée ajoute aussi un article de journal. Tout se relit dans les **Archives** du menu, et qui trouve les 8 fragments puis tient la nuit 6 découvre la vraie fin. Deux des fragments sont des cassettes, à écouter.
+Pourquoi l'horloge des caméras est-elle bloquée au 13 novembre 1987 ? Qui était Léo Octet ? Des papiers traînent parfois sur les caméras (la carte signale « papier ») : clique dessus pour les ramasser. Et le bureau change d'une nuit à l'autre : regarde ce qui apparaît sur la table. Chaque nuit gagnée ajoute aussi un article de journal. Tout se relit dans les **Archives** du menu, et qui trouve les 8 fragments puis tient la nuit 6 découvre la vraie fin. Deux des fragments sont des cassettes, à écouter. La nuit, le vieux répondeur de la boutique repasse parfois tout bas des messages de 1987. Et si tu as tout trouvé, la nuit 6 se termine sur un choix, avec deux fins.
 
 ## Nuits
 
 - La nuit 1 commence par un petit tutoriel, avec des flèches (il se rejoue depuis les Réglages).
 
+- À la fin de chaque nuit, un compte rendu : courant restant, barrettes perdues, réparations, et ton record de courant.
 - 6 nuits, de plus en plus dures, chacune avec son message au téléphone (sous-titré, et lu à voix haute si ton système a une voix française).
 - **Nuit perso** : règle chaque menace de 0 à 20, et ajoute des défis (sans leurre, courant à 50 %, tablette lente). Un défi gagné avec chaque menace à 10 ou plus donne une médaille.
 - **Nuit 7** : cachée, elle s'ouvre après la vraie fin. Cette fois, tu es Léo, et c'est le veilleur qui te cherche aux caméras.
