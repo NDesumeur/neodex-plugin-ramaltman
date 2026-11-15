@@ -47,6 +47,13 @@ Papers sometimes lie on the cameras (the map says "papier"): click them to pick 
 - **Night 7**: hidden, it unlocks after the true ending. This time you are Léo, and the guard is looking for you on the cameras.
 - **Three stars**: beat night 5, night 6, then the custom night at 20 / 20 / 20.
 
+## Characters, achievements and full screen
+
+- **Characters** (Archives): Ram, the Scalper, the Chips, Gérard, and the 1987 photos of Léo and Raymond. Each one unlocks once you have met them or a document talks about them.
+- **Achievements** (title menu): 14 achievements, from nights survived to both endings, through the newspapers, fragments, tapes and Léo's night. A message shows when you earn one.
+- **The bonus night**: night 7, "NIGHT 7 · LÉO", opens after the true ending.
+- **Full screen**: the "FULL SCREEN" menu entry, or the F key.
+
 ## Data and sync
 
 The night reached, the stars, the documents found and the custom night settings are saved by NeoDex, backed up and synced between your PCs if sync is on.

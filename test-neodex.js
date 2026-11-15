@@ -1,4 +1,4 @@
-// lancé par le test « local » de NeoDex : vérification interne, une nuit jouée en accéléré portes fermées, le redémarrage et le leurre, puis Ram qui entre par une porte ouverte
+// lancé par le test « local » de NeoDex : vérification interne, une nuit jouée en accéléré portes fermées, le redémarrage et le leurre, puis Ram qui entre par une porte ouverte, les succès, la galerie et le plein écran
 module.exports = async ({ pj, sleep }) => {
   const ra = e => pj(`(() => { const r = document.querySelector('canvas').__ra; return ${e}; })()`);
   const sc = await pj(`document.querySelector('[data-selfcheck]')?.dataset.selfcheck`); if (sc !== 'ok') throw new Error('vérification interne : ' + sc);
@@ -33,6 +33,19 @@ module.exports = async ({ pj, sleep }) => {
   // nuit 7 cachée : Léo à la porte gauche ouverte entre et gagne
   const lw = await ra(`(r.startLeo(), Object.assign(r.L7, { pos: 'L' }), r.L7.door.L = false, r.leoMove('in'), [r.L7.won, r.save.docs.includes('epi')])`);
   if (lw.includes(false)) throw new Error('nuit de Léo : ' + JSON.stringify(lw));
-  await ra(`(r.scene = 'title', 0)`);
-  return 'nuit 1 tenue jusqu\'à 6 h portes fermées, nuit 2 débloquée, Ram entre par une porte ouverte et attaque quand on baisse la tablette, journal aux archives, redémarrage des caméras et leurre audio, Gérard chassé, trappe réparée, nuit de Léo gagnée';
+  // les succès gagnés (nuits, nuit de Léo) s'annoncent, la page des succès et la galerie s'affichent, le plein écran (touche F) et la place prise
+  await pj(`window.__e = []; addEventListener('error', e => __e.push(e.message)); 0`);
+  const ach = await ra(`(r.keep(), [r.save.ach.includes('n2'), r.save.ach.includes('ep'), r.save.ach.length, r.ACH.length])`);
+  if (!ach[0] || !ach[1]) throw new Error('succès : ' + JSON.stringify(ach));
+  const shot = async n => { if (!process.env.NEO_SHOTS) return; const d = await pj(`document.querySelector('canvas').toDataURL()`); require('fs').writeFileSync(require('path').join(process.env.NEO_SHOTS, 'ramaltman-' + n + '.png'), Buffer.from(d.split(',')[1], 'base64')); };
+  for (const sc of ['succes', 'cast']) { await ra(`(r.scene = '${sc}', 0)`); await sleep(400); if (await ra('r.scene') !== sc) throw new Error('page ' + sc); await shot(sc); }
+  await ra(`(r.scene = 'title', 0)`); await sleep(300);
+  await pj(`document.dispatchEvent(new KeyboardEvent('keydown', {key: 'f', bubbles: true})), 0`); await sleep(700);
+  const fs = await pj(`(() => { const c = document.querySelector('canvas'), r = c.getBoundingClientRect(); return !!document.fullscreenElement && (Math.abs(r.height - innerHeight) < 3 || Math.abs(r.width - innerWidth) < 3); })()`);
+  await pj(`document.fullscreenElement && document.exitFullscreen(), 0`); await sleep(300);
+  if (!fs) throw new Error('le plein écran ne remplit pas l’écran');
+  const L = await pj(`(() => { const r = document.querySelector('canvas').getBoundingClientRect(); return { bottom: Math.round(r.bottom), h: Math.round(r.height), wh: innerHeight, ww: innerWidth, sw: document.documentElement.scrollWidth }; })()`);
+  if (L.bottom > L.wh + 1 || L.sw > L.ww + 1 || L.h < 300) throw new Error('le jeu dépasse la fenêtre ou reste petit : ' + JSON.stringify(L));
+  const errs = await pj(`window.__e.join(' | ')`); if (errs) throw new Error('erreur : ' + errs);
+  return 'nuit 1 tenue jusqu\'à 6 h portes fermées, nuit 2 débloquée, Ram entre par une porte ouverte et attaque quand on baisse la tablette, journal aux archives, redémarrage des caméras et leurre audio, Gérard chassé, trappe réparée, nuit de Léo gagnée, ' + ach[2] + ' / ' + ach[3] + ' succès, galerie, plein écran, ' + L.h + ' px dans ' + L.ww + '×' + L.wh;
 };

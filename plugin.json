@@ -1,9 +1,9 @@
 {
   "id": "neodex.ramaltman",
   "name": "Ram Altman",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "NDesumeur",
-  "description": "Ram Altman, un jeu d'horreur et de survie : veilleur de nuit chez Brockman & Fils, tu gardes la Barrette, 64 Go de mémoire, de minuit à 6 h, face au robot qui se fait appeler Ram Altman. Caméras, portes, lumières, trappe et un courant qui s'épuise. 6 nuits, une histoire à reconstituer, deux fins, une nuit cachée. Textes en français ou en anglais, voix en anglais, toujours sous-titrées. Dessiné au pinceau, pas en pixels.",
+  "description": "Ram Altman, un jeu d'horreur et de survie : veilleur de nuit chez Brockman & Fils, tu gardes la Barrette, 64 Go de mémoire, de minuit à 6 h, face au robot qui se fait appeler Ram Altman. Caméras, portes, lumières, trappe et un courant qui s'épuise. 6 nuits, une histoire à reconstituer, deux fins, une nuit cachée. Textes en français ou en anglais, voix en anglais, toujours sous-titrées. Dessiné au pinceau, pas en pixels. Une galerie des personnages, 14 succès à débloquer, et le plein écran (touche F).",
   "icon": "icon.png",
   "entry": "index.js",
   "view": "ramaltman",

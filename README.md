@@ -45,6 +45,13 @@ Des papiers traînent parfois sur les caméras (la carte signale « papier ») :
 - **Nuit 7** : cachée, elle s'ouvre après la vraie fin. Cette fois, tu es Léo, et c'est le veilleur qui te cherche aux caméras.
 - **Trois étoiles** : finir la nuit 5, la nuit 6, puis la nuit perso en 20 / 20 / 20.
 
+## Personnages, succès et plein écran
+
+- **Personnages** (Archives) : Ram, le Revendeur, les Puces, Gérard, et les photos de 1987 de Léo et Raymond. Chacun se débloque quand on l'a croisé ou qu'un document parle de lui.
+- **Succès** (menu du titre) : 14 succès, des nuits tenues aux deux fins, en passant par les journaux, les fragments, les cassettes et la nuit de Léo. Un message s'affiche quand on en gagne un.
+- **La nuit bonus** : c'est la nuit 7, « NUIT 7 · LÉO », qui s'ouvre après la vraie fin.
+- **Plein écran** : entrée « PLEIN ÉCRAN » du menu, ou touche F.
+
 ## Données et synchronisation
 
 La nuit atteinte, les étoiles, les documents trouvés et les réglages de la nuit perso sont enregistrés par NeoDex, sauvegardés et synchronisés entre tes PC si la synchro est activée.
