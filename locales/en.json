@@ -276,7 +276,6 @@
  "NUIT 7 · TU ES LÉO": "NIGHT 7 · YOU ARE LÉO",
  "Nuit 7, tu es Léo,": "Night 7, you are Léo,",
  "Nuit atteinte, étoiles et réglages de la nuit perso.": "Night reached, stars and custom night settings.",
- "Nuit atteinte, étoiles, documents trouvés, records et réglages.": "Night reached, stars, documents found, records and settings.",
  "nuit de Léo :": "Léo's night:",
  "NUIT PERSO": "CUSTOM NIGHT",
  "Objet : prise de poste, 00 h – 06 h": "Subject: taking up your post, 12 AM – 6 AM",
@@ -432,5 +431,6 @@
  "Raymond Altman, le meilleur ami de Léo. Il a construit MNÉMO avec lui.": "Raymond Altman, Léo’s best friend. He built MNÉMO with him.",
  "SUCCÈS (": "ACHIEVEMENTS (",
  "11px Georgia": "11px Georgia",
- "14px Georgia": "14px Georgia"
+ "14px Georgia": "14px Georgia",
+ "Rien n'est synchronisé : tes records restent sur cet appareil.": "Nothing is synced: your records stay on this device."
 }
