@@ -1,8 +1,8 @@
 {
   "pluginId": "neodex.ramaltman",
   "repo": "NDesumeur/neodex-plugin-ramaltman",
-  "version": "1.1.0",
-  "sha256": "d9db9c8a9c2694ce49e5c692a6bdc5d73436c3a4f3b88590e4d2769de0fc22c4",
-  "approvedAt": "2026-11-16T04:14:39.156Z",
-  "signature": "tebLdb+m0CMINiXoK7XPXUJJcMw+HcswnmvJn2LP7TuPAEFBMvVkOZiAl+LLS1UVovs8Az68yfJ9y2KkIBbYBA=="
+  "version": "1.1.1",
+  "sha256": "6f137d7f3b10283b65edf3072f1d5e8d3e43e253f38e5eb4cbefdf9778d1653d",
+  "approvedAt": "2026-11-19T23:26:39.263Z",
+  "signature": "C45/RYWPK1JwYb90H2aFYMwjo+YxXxLZjXRQYj0eUWlgbNVrJIDt/GzdgkjQ8Fr9gfuDRreYPXvyze4t24wlDA=="
 }
