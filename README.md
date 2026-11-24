@@ -35,6 +35,10 @@ En 1987, Léo Brockman et son ami Raymond Altman ont construit **MNÉMO** (Machi
 
 Des papiers traînent parfois sur les caméras (la carte signale « papier ») : clique dessus pour les ramasser. Et le bureau change d'une nuit à l'autre : regarde ce qui apparaît sur la table. Chaque nuit gagnée ajoute aussi un article de journal. Tout se relit dans les **Archives** du menu, avec la page **Ce que tu sais**, qui résume en phrases simples ce que tu as compris jusqu'ici. Qui trouve les 8 fragments puis tient la nuit 6 découvre la vraie fin. Deux des fragments sont des cassettes, à écouter. La nuit, le vieux répondeur de la boutique repasse parfois tout bas des messages de 1987. Et si tu as tout trouvé, la nuit 6 se termine sur un choix, avec deux fins.
 
+## Les courriels
+
+À 6 h, après chaque nuit gagnée (de la 1 à la 5), la **messagerie de la boutique** s'allume : deux ou trois courriels de Gérard, de ClosedRAM, de la ville, de l'hôpital, d'un expéditeur inconnu… et de Ram lui-même. Ils annoncent ce qui change la nuit suivante (le Revendeur, les pannes, les Puces, Gérard, les faux bruits) et racontent l'histoire par petits bouts. **Entrée** ou **NUIT suivante** lance la nuit ; tous les courriels se relisent dans les **Archives** (bouton COURRIELS).
+
 ## Nuits
 
 - La nuit 1 commence par un petit tutoriel, avec des flèches (il se rejoue depuis les Réglages).

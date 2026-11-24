@@ -13,6 +13,12 @@ module.exports = async ({ pj, sleep }) => {
   if (await ra('r.scene') !== 'six') throw new Error('6 h pas atteintes : ' + await ra('r.scene + " " + r.S.time + " RAM " + r.S.ram'));
   if (await ra('r.save.night') < 2) throw new Error('nuit 2 pas débloquée');
   if (!await ra("r.save.docs.includes('j1')")) throw new Error('le journal de la nuit 1 manque aux archives');
+  // la messagerie (1.2.0) : après 6 h, un clic ouvre les courriels de la nuit gagnée ; Entrée lance la nuit suivante
+  await sleep(3400); await pj(`document.querySelector('canvas').dispatchEvent(new PointerEvent('pointerdown', { clientX: -9999, clientY: -9999 })), 0`); await sleep(200);
+  if (await ra('r.scene') !== 'mail') throw new Error('la messagerie ne s\'ouvre pas après la nuit 1 : ' + await ra('r.scene'));
+  if (await ra("r.MAILS.filter(m => m.n === 1).length") !== 3) throw new Error('courriels de la nuit 1 : ' + await ra("r.MAILS.filter(m => m.n === 1).length"));
+  await pj(`document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' })), 0`); await sleep(200);
+  if (await ra('r.S.n') !== 2) throw new Error('Entrée dans la messagerie ne lance pas la nuit 2 : ' + await ra('r.S.n'));
   // nuit 3 : Ram arrive à la porte gauche ouverte, il doit entrer
   await ra(`(r.start(3), r.speed = 40, 0)`);
   for (let i = 0; i < 50 && await ra('r.scene') !== 'play'; i++) await sleep(100);
@@ -38,6 +44,7 @@ module.exports = async ({ pj, sleep }) => {
   const ach = await ra(`(r.keep(), [r.save.ach.includes('n2'), r.save.ach.includes('ep'), r.save.ach.length, r.ACH.length])`);
   if (!ach[0] || !ach[1]) throw new Error('succès : ' + JSON.stringify(ach));
   const shot = async n => { if (!process.env.NEO_SHOTS) return; const d = await pj(`document.querySelector('canvas').toDataURL()`); require('fs').writeFileSync(require('path').join(process.env.NEO_SHOTS, 'ramaltman-' + n + '.png'), Buffer.from(d.split(',')[1], 'base64')); };
+  await ra(`(r.scene = 'mail', 0)`); await sleep(400); await shot('courriels');
   for (const sc of ['succes', 'cast']) { await ra(`(r.scene = '${sc}', 0)`); await sleep(400); if (await ra('r.scene') !== sc) throw new Error('page ' + sc); await shot(sc); }
   await ra(`(r.scene = 'title', 0)`); await sleep(300);
   await pj(`document.dispatchEvent(new KeyboardEvent('keydown', {key: 'f', bubbles: true})), 0`); await sleep(700);

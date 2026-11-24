@@ -37,6 +37,10 @@ In 1987, Léo Brockman and his friend Raymond Altman built **MNEMO** (Mind-to-Ne
 
 Papers sometimes lie on the cameras (the map says "papier"): click them to pick them up. And the office changes from night to night: watch what appears on the desk. Every night you win also adds a newspaper clipping. Everything can be reread in the **Archives** from the menu, with the **What you know** page, which sums up in plain sentences what you have understood so far. Whoever finds all 8 fragments and survives night 6 gets the true ending. Two of the fragments are tapes you can listen to. At night, the shop's old answering machine sometimes plays 1987 messages, very low. And if you found everything, night 6 ends with a choice and two endings.
 
+## Emails
+
+At 6 am, after each night you win (from 1 to 5), the **shop's mailbox** lights up: two or three emails from Gérard, ClosedRAM, the city, the hospital, an unknown sender… and from Ram himself. They tell you what changes the next night (the Scalper, the breakdowns, the Bugs, Gérard, the fake sounds) and tell the story bit by bit. **Enter** or **NIGHT** starts the next night; every email can be read again in the **Archives** (EMAILS button).
+
 ## Nights
 
 - Night 1 starts with a short tutorial with arrows (replay it from Settings).
