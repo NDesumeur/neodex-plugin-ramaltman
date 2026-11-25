@@ -1,7 +1,7 @@
 {
   "id": "neodex.ramaltman",
   "name": "Ram Altman",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "author": "NDesumeur",
   "description": "Ram Altman, un jeu d'horreur et de survie : veilleur de nuit chez Brockman & Fils, tu gardes la Barrette, 64 Go de mémoire, de minuit à 6 h, face au robot qui se fait appeler Ram Altman. Caméras, portes, lumières, trappe et un courant qui s'épuise. 6 nuits, une histoire à reconstituer, deux fins, une nuit cachée. Textes en français ou en anglais, voix en anglais, toujours sous-titrées. Dessiné au pinceau, pas en pixels. Une galerie des personnages, 14 succès à débloquer, et le plein écran (touche F).",
   "icon": "icon.png",
@@ -22,5 +22,95 @@
   "sdk": "2.1.0",
   "permissions": [
     "storage"
+  ],
+  "succes": [
+    {
+      "id": "n2",
+      "nom": "Première garde",
+      "texte": "Survivre à la nuit 1"
+    },
+    {
+      "id": "n4",
+      "nom": "Mi-parcours",
+      "texte": "Survivre à la nuit 3"
+    },
+    {
+      "id": "n6",
+      "nom": "La semaine entière",
+      "texte": "Survivre à la nuit 5"
+    },
+    {
+      "id": "s2",
+      "nom": "Deux étoiles",
+      "texte": "Survivre à la nuit 6"
+    },
+    {
+      "id": "s3",
+      "nom": "Trois étoiles",
+      "texte": "Nuit perso 20 / 20 / 20",
+      "cache": true
+    },
+    {
+      "id": "md",
+      "nom": "Médaillé",
+      "texte": "Gagner une médaille de défi"
+    },
+    {
+      "id": "jr",
+      "nom": "Revue de presse",
+      "texte": "Lire les 6 journaux"
+    },
+    {
+      "id": "fr",
+      "nom": "Mémoire complète",
+      "texte": "Trouver les 8 fragments"
+    },
+    {
+      "id": "tp",
+      "nom": "Mélomane",
+      "texte": "Trouver les 2 cassettes"
+    },
+    {
+      "id": "fn",
+      "nom": "La vérité",
+      "texte": "Atteindre la vraie fin",
+      "cache": true
+    },
+    {
+      "id": "ch",
+      "nom": "Les deux choix",
+      "texte": "Voir les deux fins",
+      "cache": true
+    },
+    {
+      "id": "ep",
+      "nom": "Le fils retrouvé",
+      "texte": "Finir la nuit 7 avec Léo",
+      "cache": true
+    },
+    {
+      "id": "pw",
+      "nom": "Économe",
+      "texte": "Finir une nuit avec 40 % de courant"
+    },
+    {
+      "id": "al",
+      "nom": "Archiviste",
+      "texte": "Tout trouver dans les archives"
+    }
+  ],
+  "records": [
+    {
+      "id": "nuits",
+      "nom": "Nuits survécues",
+      "sens": "haut",
+      "format": "nombre"
+    },
+    {
+      "id": "courant",
+      "nom": "Le plus de courant gardé",
+      "sens": "haut",
+      "format": "pourcent"
+    }
   ]
 }

@@ -820,6 +820,9 @@ export default async function (ctx) {
   const SCAN = (() => { const c = mkCanvas(W, H), s = c.getContext('2d'); s.fillStyle = 'rgba(0,0,0,.22)'; for (let y = 0; y < H; y += 3) s.fillRect(0, y, W, 1); return c; })();
   // la sauvegarde : nuit atteinte, étoiles, nuit perso
   const save = { night: 1, stars: 0, custom: [10, 10, 10], docs: [], chall: [false, false, false], medals: [], best: {}, ...(await folder.read('progression').catch(() => null) || {}) };
+  // les trophées de NeoDex (3.4.8 et plus) : succès et records déclarés dans plugin.json ; sur un NeoDex plus ancien, rien ne se passe
+  const trophy = (id, quiet) => { ctx.games?.unlock(id, quiet).catch(() => {}); };  // quiet : sans message de NeoDex (le jeu montre déjà le sien)
+  const trophyRecord = (id, v) => { if (v != null && Number.isFinite(+v)) ctx.games?.record(id, +v).catch(() => {}); };
   const ACH = [['n2', 'Première garde', 'Survivre à la nuit 1', () => save.night >= 2], ['n4', 'Mi-parcours', 'Survivre à la nuit 3', () => save.night >= 4],
     ['n6', 'La semaine entière', 'Survivre à la nuit 5', () => save.night >= 6], ['s2', 'Deux étoiles', 'Survivre à la nuit 6', () => save.stars >= 2],
     ['s3', 'Trois étoiles', 'Nuit perso 20 / 20 / 20', () => save.stars >= 3], ['md', 'Médaillé', 'Gagner une médaille de défi', () => save.medals.length > 0],
@@ -828,7 +831,13 @@ export default async function (ctx) {
     ['fn', 'La vérité', 'Atteindre la vraie fin', () => save.docs.includes('fin')], ['ch', 'Les deux choix', 'Voir les deux fins', () => save.docs.includes('fo') && save.docs.includes('fc')],
     ['ep', 'Le fils retrouvé', 'Finir la nuit 7 avec Léo', () => save.docs.includes('epi')], ['pw', 'Économe', 'Finir une nuit avec 40 % de courant', () => Object.values(save.best).some(v => v >= 40)],
     ['al', 'Archiviste', 'Tout trouver dans les archives', () => DOCS().every(d => save.docs.includes(d.id))]];
-  const keep = () => { for (const a of ACH) if (!save.ach.includes(a[0]) && a[3]()) { save.ach.push(a[0]); try { A.chime(); flash(tr('Succès : ') + tr(a[1]), '#ffd84a'); } catch {} } folder.write('progression', save).catch(() => {}); };
+  // les trophées, tirés des statistiques et des records gardés (aussi à l'ouverture : ce qui a été fait avant compte)
+  function raTrophies() {  // 'n2' 'n4' 'n6' 's2' 's3' 'md' 'jr' 'fr' 'tp' 'fn' 'ch' 'ep' 'pw' 'al' : les succès du jeu, repris tels quels
+    const pw = Object.values(save.best), sig = [save.ach?.length, save.night, pw.join()].join(); if (sig === raTrophies.sig) return; raTrophies.sig = sig;
+    for (const id of save.ach || []) trophy(id, true);
+    trophyRecord('nuits', save.night > 1 ? save.night - 1 : null); trophyRecord('courant', pw.length ? Math.max(...pw) : null);
+  }
+  const keep = () => { for (const a of ACH) if (!save.ach.includes(a[0]) && a[3]()) { save.ach.push(a[0]); try { A.chime(); flash(tr('Succès : ') + tr(a[1]), '#ffd84a'); } catch {} } folder.write('progression', save).catch(() => {}); raTrophies(); };
   save.opts = { sfx: 1, voice: 1, pan: 1, calm: false, lang: 'auto', ...save.opts }; if (save.opts.lang !== 'auto') { setLang(save.opts.lang); if (LANG === 'en') { rooms = buildRooms(); office = buildOffice(); } } A.setVol(save.opts.sfx); A.voice = save.opts.voice; A.prep();
 
   // ---------- état ----------
@@ -1363,7 +1372,7 @@ export default async function (ctx) {
   }
   // ---------- les archives : ce que tu as appris ----------
   const DOCS = () => [...FRAGS.map(([id, t, x]) => ({ id, t, x, k: TAPES.includes(id) ? 'CASSETTE' : 'FRAGMENT' })), ...Object.entries(NEWS).map(([n, [t, x]]) => ({ id: 'j' + n, t, x, k: 'JOURNAL' })), { id: 'fin', t: TRUE_END[0], x: TRUE_END[1], k: '???' }, { id: 'fo', t: END_O[0], x: END_O[1], k: '???' }, { id: 'fc', t: END_C[0], x: END_C[1], k: '???' }, { id: 'epi', t: EPI[0], x: EPI[1], k: '???' }].map(d => ({ ...d, t: tr(d.t), x: tr(d.x) }));
-  save.ach ??= ACH.filter(a => a[3]()).map(a => a[0]);  // une ancienne partie gagne ses succès sans annonce
+  save.ach ??= ACH.filter(a => a[3]()).map(a => a[0]); setTimeout(raTrophies);  // une ancienne partie gagne ses succès sans annonce
   const KNOW = [[0, 'Tu gardes la Barrette : 64 Go de mémoire, sous verre, chez Brockman & Fils.'], [0, 'Ram Altman, le patron de ClosedRAM, veut la Barrette. Il vient la nuit.'],
     ['j1', 'En 1987, Léo Brockman, 19 ans, a eu un accident. Son ami Raymond a disparu.'], ['f1', 'La mère de Léo avait perdu la mémoire. Léo avait peur que ça lui arrive.'],
     ['f2', 'Léo et Raymond ont construit MNÉMO, pour copier la mémoire de Léo sur de la RAM.'], [3, "Gérard, l'ancien veilleur, est le père de Léo."],
